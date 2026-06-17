@@ -64,7 +64,6 @@ export default function GeneradorCartas() {
     setIsOpen(false);
   };
 
-  // PANTALLA DE LOGIN
   if (!isLogged) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4 font-serif">
@@ -87,7 +86,6 @@ export default function GeneradorCartas() {
     );
   }
 
-  // PANTALLA PRINCIPAL
   return (
     <div className="min-h-screen bg-black text-white font-serif antialiased pb-12 print:bg-white print:text-black print:p-0">
       <style>{`
@@ -98,10 +96,8 @@ export default function GeneradorCartas() {
         }
       `}</style>
 
-      {/* HEADER CORPORATIVO NEGRO (NO SE IMPRIME) */}
       <header className="no-print bg-neutral-900 border-b border-neutral-800 py-6 px-4 shadow-xl">
         <div className="max-w-4xl mx-auto flex flex-col">
-          {/* Fila 1: Imágenes y botón de cerrar sesión */}
           <div className="flex justify-between items-start mb-6">
             <img src="/ministerio.png" alt="Ministerio" className="h-16 md:h-20 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
             <div className="flex flex-col items-end">
@@ -112,7 +108,6 @@ export default function GeneradorCartas() {
             </div>
           </div>
           
-          {/* Fila 2: Títulos Centrados */}
           <div className="text-center w-full">
             <h1 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-widest whitespace-nowrap drop-shadow-sm">
               Conjunto Residencial Torre D-10
@@ -124,7 +119,6 @@ export default function GeneradorCartas() {
         </div>
       </header>
 
-      {/* PANEL DE CONTROL BUSCADOR */}
       <div className="no-print max-w-3xl mx-auto pt-8 px-4">
         <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-6 items-end relative z-30">
           
@@ -172,14 +166,13 @@ export default function GeneradorCartas() {
           onClick={() => window.print()}
           disabled={!propietarioSeleccionado}
           className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${
-            propietarioSeleccionado ? 'bg-white hover:bg-gray-200 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
+            propietarioSeleccionado ? 'bg-white hover:bg-gray-100 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
           }`}
         >
           🖨️ Generar y Descargar PDF
         </button>
       </div>
 
-      {/* ÁREA DE IMPRESIÓN (PDF) */}
       <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] font-serif text-justify text-[12pt]">
         {propietarioSeleccionado ? (
           <div>
@@ -192,12 +185,13 @@ export default function GeneradorCartas() {
               Constancia de Residencia
             </h2>
 
+            {/* MODIFICACIÓN: SE QUITARON LAS COMILLAS NATIVAS QUE RODEABAN LOS STRONG EN PROPIETARIO, CEDULA Y DIRECCIÓN */}
             <p className="mb-6 leading-[1.8] tracking-normal font-normal">
               Quienes suscriben, en representación del <strong className="font-bold">“COMITÉ MULTIFAMILIAR DE GESTIÓN (C.M.G.) DE LA TORRE D-10”</strong>, 
               en el ejercicio de nuestras facultades como Voceros Principales del referido Comité en el Urbanismo "Simón Bolívar", 
-              Sector D, Ciudad Tiuna, por medio de la presente, hacemos constar que el (la) ciudadano (a) <strong className="font-bold uppercase">“{propietarioSeleccionado.PROPIETARIO}”</strong>, 
-              titular de la cédula de identidad N° <strong className="font-bold">“V-{propietarioSeleccionado.CEDULA}”</strong>, de nacionalidad venezolano (a), 
-              habita en la: <strong className="font-bold">“Torre D-10, Piso {propietarioSeleccionado.PISO}, Apartamento {propietarioSeleccionado.APARTAMENTO}”</strong>, 
+              Sector D, Ciudad Tiuna, por medio de la presente, hacemos constar que el (la) ciudadano (a) <strong className="font-bold uppercase">{propietarioSeleccionado.PROPIETARIO}</strong>, 
+              titular de la cédula de identidad N° <strong className="font-bold">V-{propietarioSeleccionado.CEDULA}</strong>, de nacionalidad venezolano (a), 
+              habita en la: <strong className="font-bold">Torre D-10, Piso {propietarioSeleccionado.PISO}, Apartamento {propietarioSeleccionado.APARTAMENTO}</strong>, 
               desde el mes de {propietarioSeleccionado["INICIO MES"]} del año {propietarioSeleccionado["INICIO AÑO"]}.
             </p>
 
@@ -209,13 +203,11 @@ export default function GeneradorCartas() {
               Constancia que se expide a petición de la parte interesada en la ciudad de Caracas, a los {fechaActual.diaLetras} ({fechaActual.diaNumero}) días del mes de {fechaActual.mesLetras} del año {fechaActual.anoNumero}.
             </p>
 
-            {/* SECCIÓN FIRMAS CENTRALIZADA CON EL MISMO ESPACIADO (leading-[1.8]) Y 4 ESPACIOS EN BLANCO (<br/>) */}
             <div className="text-center leading-[1.8]">
               <p className="font-normal m-0 p-0">Atentamente,</p>
               <p className="m-0 p-0"><strong className="font-bold">“Comité Multifamiliar de Gestión de la “TORRE D-10””</strong></p>
             </div>
             
-            {/* 4 espacios en blanco exactos */}
             <br/><br/><br/><br/>
 
             <div className="mb-10 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
