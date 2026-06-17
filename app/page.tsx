@@ -19,7 +19,7 @@ const mesesLetras = [
 ];
 
 export default function GeneradorCartas() {
-  // Estados de la Aplicación
+  // Estados globales del sistema
   const [isLogged, setIsLogged] = useState(false);
   const [password, setPassword] = useState('');
   const [buscar, setBuscar] = useState('');
@@ -28,7 +28,7 @@ export default function GeneradorCartas() {
   const [fechaManual, setFechaManual] = useState('');
   const [fechaActual, setFechaActual] = useState({ diaLetras: '', diaNumero: 0, mesLetras: '', anoNumero: 2026 });
 
-  // Inicializar la fecha con el día de hoy
+  // Inicializar la fecha con el día de hoy de forma automática
   useEffect(() => {
     const hoy = new Date();
     actualizarFecha(hoy);
@@ -59,7 +59,7 @@ export default function GeneradorCartas() {
     }
   };
 
-  // Filtrado del buscador híbrido
+  // Filtrado reactivo para el buscador inteligente híbrido
   const listaFiltrada = propietariosData.filter((item: any) =>
     item.APARTAMENTO?.toString().toLowerCase().includes(buscar.toLowerCase()) ||
     item.PROPIETARIO?.toString().toLowerCase().includes(buscar.toLowerCase())
@@ -71,37 +71,37 @@ export default function GeneradorCartas() {
     setIsOpen(false);
   };
 
-  // Función de impresión con nomenclatura dinámica restaurada y blindada
+  // Manejo de la impresión con nomenclatura dinámica exacta
   const handlePrint = () => {
     if (!propietarioSeleccionado) return;
     
-    // Extracción estricta de Primer Nombre y Primer Apellido
+    // Extracción estricta del Primer Nombre y Primer Apellido
     const partesNombre = propietarioSeleccionado.PROPIETARIO.trim().split(/\s+/);
     const primerNombre = partesNombre[0] || '';
     const primerApellido = partesNombre.length > 1 ? partesNombre[1] : '';
     const nombreFormateado = `${primerNombre} ${primerApellido}`.trim();
     
-    // Formatear la fecha actual de descarga (dd-mm-yyyy)
+    // Formatear la fecha del día de descarga exacta (dd-mm-yyyy)
     const hoy = new Date();
     const dia = String(hoy.getDate()).padStart(2, '0');
     const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const ano = hoy.getFullYear();
     const fechaDescarga = `${dia}-${mes}-${ano}`;
     
-    // Aplicar la nomenclatura solicitada al título del documento
+    // Inyectar nomenclatura solicitada al título de la página
     const tituloOriginal = document.title;
     document.title = `Carta de Residencia – ${nombreFormateado} – Apto ${propietarioSeleccionado.APARTAMENTO} – ${fechaDescarga}`;
     
-    // Disparar la impresión nativa
+    // Disparar ventana de PDF nativa
     window.print();
     
-    // Restaurar el título original de la pestaña web un segundo después
+    // Restaurar título original de la pestaña un segundo después
     setTimeout(() => {
       document.title = tituloOriginal;
     }, 1000);
   };
 
-  // Renderizado de la pantalla de Login (Fondo Negro Ejecutivo)
+  // Bloque de Seguridad: Acceso de Administrador (Fondo Negro Corporativo)
   if (!isLogged) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4 font-serif">
@@ -110,7 +110,7 @@ export default function GeneradorCartas() {
             <img src="/ministerio.png" alt="Min" className="h-12 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display='none'} />
             <img src="/logo_edificio.png" alt="Torre D10" className="h-12 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display='none'} />
           </div>
-          <h1 className="text-xl font-bold text-center text-white uppercase tracking-widest mb-6">Portal Administrative</h1>
+          <h1 className="text-xl font-bold text-center text-white uppercase tracking-widest mb-6">Portal Administrativo</h1>
           <input 
             type="password" 
             placeholder="Clave de administrador" 
@@ -118,36 +118,38 @@ export default function GeneradorCartas() {
             value={password} 
             onChange={e => setPassword(e.target.value)} 
           />
-          <button type="submit" className="w-full bg-neutral-200 hover:bg-white text-black font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg">Entrar al Sistema</button>
+          <form_button type="submit" className="w-full bg-neutral-200 hover:bg-white text-black font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg">Entrar al Sistema</form_button>
         </form>
       </div>
     );
   }
 
-  // Interfaz de Usuario Principal
+  // Interfaz del Panel de Administración y Generación
   return (
     <div className="min-h-screen bg-black text-white font-serif antialiased pb-12 print:bg-white print:text-black print:p-0">
       
-      {/* CSS DE IMPRESIÓN CONFIGURADO A TAMAÑO CARTA ESTÁNDAR Y PROFESIONAL */}
+      {/* CORRECCIÓN CRÍTICA DE IMPRESIÓN: Fuerza la altura automática eliminando la segunda hoja vacía */}
       <style>{`
         @media print {
           @page {
             size: letter portrait;
-            margin: 2.5cm 3cm 2.5cm 3cm; /* Margen Estándar Profesional: Superior/Inferior 2.5cm, Izquierda/Derecha 3cm */
+            margin: 2.5cm 3cm 2.5cm 3cm; /* Márgenes estándar oficiales solicitados */
           }
           .no-print { display: none !important; }
           body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .print-area { 
             box-shadow: none !important; 
             margin: 0 !important; 
-            padding: 0 !important; /* Elimina el padding de pantalla para respetar el margen de la impresora */
+            padding: 0 !important; 
             width: 100% !important; 
             max-width: 100% !important;
+            min-height: auto !important; /* Corrige el desborde y elimina la segunda hoja */
+            height: auto !important;      /* Libera el alto estricto al imprimir */
           }
         }
       `}</style>
       
-      {/* HEADER EN EL PORTAL WEB */}
+      {/* HEADER DE LA PLATAFORMA WEB */}
       <header className="no-print bg-neutral-900 border-b border-neutral-800 py-6 px-4 shadow-xl">
         <div className="max-w-4xl mx-auto flex flex-col">
           <div className="flex justify-between items-start mb-6">
@@ -164,7 +166,7 @@ export default function GeneradorCartas() {
         </div>
       </header>
 
-      {/* PANEL DE CONTROL DEL BUSCADOR */}
+      {/* CONTROLES DE BÚSQUEDA Y CALENDARIO */}
       <div className="no-print max-w-3xl mx-auto pt-8 px-4">
         <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-6 items-end relative z-30">
           <div className="w-full md:w-2/3 relative">
@@ -196,11 +198,11 @@ export default function GeneradorCartas() {
         <button onClick={handlePrint} disabled={!propietarioSeleccionado} className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${propietarioSeleccionado ? 'bg-white hover:bg-gray-200 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'}`}>🖨️ Generar y Descargar PDF</button>
       </div>
 
-      {/* VISTA PREVIA IMPE cables (P-[2.5CM] SIMULA LA HOJA REAL EN PANTALLA) */}
+      {/* ÁREA DE RENDERIZADO Y MAQUETACIÓN DE LA HOJA (PRINT AREA) */}
       <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] font-serif text-[12pt] text-justify flex flex-col justify-between">
         {propietarioSeleccionado ? (
           <>
-            {/* BLOQUE SUPERIOR DE LA CARTA */}
+            {/* BLOQUE DE CONTENIDO SUPERIOR */}
             <div>
               <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-8">
                 <img src="/ministerio.png" alt="Ministerio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
@@ -229,14 +231,14 @@ export default function GeneradorCartas() {
               </p>
             </div>
 
-            {/* BLOQUE INFERIOR DE LA CARTA: CONTROL DE ESPACIOS OPTIMIZADO PARA EVITAR LA SEGUNDA HOJA */}
+            {/* BLOQUE DE VALIDACIÓN E INFERIOR (ESTRUCTURA INALTERABLE) */}
             <div>
               <div className="text-center leading-[1.7]">
                 <p className="font-normal m-0 p-0">Atentamente,</p>
                 <p className="m-0 p-0"><strong className="font-bold">Comité Multifamiliar de Gestión de la TORRE D-10</strong></p>
               </div>
               
-              {/* Espacio controlado en lugar de <br/> libres para asegurar la hoja única */}
+              {/* Contenedor espaciador dinámico y seguro */}
               <div className="h-14"></div>
 
               <div className="mb-5 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
