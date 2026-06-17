@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import propietariosData from '../data/propietarios.json';
 
-// Utilidades limpias (DRY)
 const numeroALetras = (num: number): string => {
   const unidades = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve', 'treinta', 'treinta y un'];
   return unidades[num] || num.toString();
@@ -12,7 +11,6 @@ const numeroALetras = (num: number): string => {
 const mesesLetras = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
 export default function GeneradorCartas() {
-  // Estados
   const [isLogged, setIsLogged] = useState(false);
   const [password, setPassword] = useState('');
   const [buscar, setBuscar] = useState('');
@@ -21,7 +19,6 @@ export default function GeneradorCartas() {
   const [fechaManual, setFechaManual] = useState('');
   const [fechaActual, setFechaActual] = useState({ diaLetras: '', diaNumero: 0, mesLetras: '', anoNumero: 2026 });
 
-  // Efecto Inicial: Configurar fecha de hoy
   useEffect(() => {
     const hoy = new Date();
     actualizarFecha(hoy);
@@ -46,8 +43,13 @@ export default function GeneradorCartas() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'admin2026') { setIsLogged(true); }
-    else alert('Acceso denegado. Verifique sus credenciales.');
+    else alert('Clave de acceso denegada.');
   };
+
+  const listaFiltrada = propietariosData.filter((item: any) =>
+    item.APARTAMENTO?.toString().toLowerCase().includes(buscar.toLowerCase()) ||
+    item.PROPIETARIO?.toString().toLowerCase().includes(buscar.toLowerCase())
+  );
 
   const seleccionarPropietario = (prop: any) => {
     setPropietarioSeleccionado(prop);
@@ -55,36 +57,24 @@ export default function GeneradorCartas() {
     setIsOpen(false);
   };
 
-  // Motor de Búsqueda
-  const listaFiltrada = propietariosData.filter((item: any) =>
-    item.APARTAMENTO?.toString().toLowerCase().includes(buscar.toLowerCase()) ||
-    item.PROPIETARIO?.toString().toLowerCase().includes(buscar.toLowerCase())
-  );
-
-  // Generador de PDF con Nomenclatura Dinámica
   const handlePrint = () => {
     if (!propietarioSeleccionado) return;
     
-    // Extracción de Primer Nombre y Primer Apellido
     const partesNombre = propietarioSeleccionado.PROPIETARIO.trim().split(' ');
     const primerNombre = partesNombre[0] || '';
     const primerApellido = partesNombre.length > 1 ? partesNombre[1] : '';
     const nombreFormateado = `${primerNombre} ${primerApellido}`.trim();
     
-    // Fecha formato dd-mm-yyyy
     const fechaDescarga = new Date().toLocaleDateString('es-VE').replace(/\//g, '-');
     
-    // Nomenclatura solicitada
     const tituloOriginal = document.title;
     document.title = `Carta de Residencia – ${nombreFormateado} – Apto ${propietarioSeleccionado.APARTAMENTO} – ${fechaDescarga}`;
     
     window.print();
     
-    // Restaurar título de la página tras imprimir
     setTimeout(() => { document.title = tituloOriginal; }, 1000);
   };
 
-  // Pantalla de Login (Gatekeeper)
   if (!isLogged) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4 font-serif">
@@ -101,39 +91,28 @@ export default function GeneradorCartas() {
     );
   }
 
-  // Interfaz Principal
   return (
     <div className="min-h-screen bg-black text-white font-serif antialiased pb-12 print:bg-white print:text-black print:p-0">
       
-      {/* CSS DE IMPRESIÓN RIGUROSO INYECTADO */}
+      {/* CSS MAGISTRAL: Mantiene la vista previa hermosa y configura la impresora perfecto */}
       <style>{`
         @media print {
-          /* 1. margin 0 en @page elimina fecha, hora, link y número de página nativos del navegador */
-          @page { size: A4 portrait; margin: 0; }
-          
-          /* 2. Ocultar elementos web */
-          .no-print { display: none !important; }
-          
-          /* 3. Estructura de Hoja Única con Márgenes Internos Simulados */
-          .print-area { 
-            display: flex !important; 
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            height: 100vh !important; /* Mantiene la carta en 1 sola hoja */
-            padding: 2.5cm 3cm !important; /* Top/Bottom 2.5cm, Left/Right 3cm */
-            box-sizing: border-box !important;
-            margin: 0 !important;
-            page-break-after: avoid !important;
-            page-break-before: avoid !important;
-            background-color: white !important;
+          @page {
+            size: letter portrait;
+            margin: 2.5cm 3cm 2.5cm 3cm; /* Superior 2.5, Inferior 2.5, Izquierda 3, Derecha 3 */
           }
-
-          /* Forzar colores de fuente en impresión */
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .no-print { display: none !important; }
+          body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .print-area { 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            padding: 0 !important; /* Eliminamos el padding visual para usar el margen real de la impresora */
+            width: 100% !important; 
+            max-width: 100% !important;
+          }
         }
       `}</style>
       
-      {/* ENCABEZADO WEB */}
       <header className="no-print bg-neutral-900 border-b border-neutral-800 py-6 px-4 shadow-xl">
         <div className="max-w-4xl mx-auto flex flex-col">
           <div className="flex justify-between items-start mb-6">
@@ -150,7 +129,6 @@ export default function GeneradorCartas() {
         </div>
       </header>
 
-      {/* PANEL DE CONTROL */}
       <div className="no-print max-w-3xl mx-auto pt-8 px-4">
         <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-6 items-end relative z-30">
           <div className="w-full md:w-2/3 relative">
@@ -161,16 +139,12 @@ export default function GeneradorCartas() {
             </div>
             {isOpen && (
               <ul className="absolute left-0 right-0 mt-2 max-h-60 bg-black border border-neutral-800 rounded-xl overflow-y-auto shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
-                {listaFiltrada.length > 0 ? (
-                  listaFiltrada.map((item: any, idx: number) => (
-                    <li key={idx} onClick={() => seleccionarPropietario(item)} className="p-4 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white cursor-pointer flex justify-between items-center transition-colors">
-                      <span className="font-bold bg-neutral-900 px-3 py-1 rounded text-white border border-neutral-800">{item.APARTAMENTO}</span>
-                      <span className="text-xs truncate max-w-[200px] uppercase font-mono">{item.PROPIETARIO}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li className="p-4 text-sm text-neutral-500 text-center">No se encontraron registros</li>
-                )}
+                {listaFiltrada.map((item: any, idx: number) => (
+                  <li key={idx} onClick={() => seleccionarPropietario(item)} className="p-4 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white cursor-pointer flex justify-between items-center transition-colors">
+                    <span className="font-bold bg-neutral-900 px-3 py-1 rounded text-white border border-neutral-800">{item.APARTAMENTO}</span>
+                    <span className="text-xs truncate max-w-[200px] uppercase font-mono">{item.PROPIETARIO}</span>
+                  </li>
+                ))}
               </ul>
             )}
           </div>
@@ -182,22 +156,21 @@ export default function GeneradorCartas() {
         <button onClick={handlePrint} disabled={!propietarioSeleccionado} className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${propietarioSeleccionado ? 'bg-white hover:bg-gray-200 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'}`}>🖨️ Generar y Descargar PDF</button>
       </div>
 
-      {/* ÁREA DE IMPRESIÓN (PDF) */}
-      <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 font-serif text-[12pt] text-justify shadow-2xl">
+      {/* VISTA PREVIA HERMOSA: El p-[2.5cm] hace que en pantalla se vea como una hoja real */}
+      <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] font-serif text-[12pt] text-justify flex flex-col justify-between">
         {propietarioSeleccionado ? (
           <>
-            {/* SECCIÓN SUPERIOR: Membrete y Cuerpo */}
             <div>
               <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-8">
                 <img src="/ministerio.png" alt="Ministerio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
                 <img src="/logo_edificio.png" alt="Logo Edificio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
               </div>
 
-              <h2 className="text-center text-[18pt] font-bold underline uppercase tracking-wide mb-10">
+              <h2 className="text-center text-[18pt] font-bold underline uppercase tracking-wide mb-8">
                 Constancia de Residencia
               </h2>
 
-              <p className="mb-6 leading-[1.8] font-normal">
+              <p className="mb-5 leading-[1.7] font-normal">
                 Quienes suscriben, en representación del <strong className="font-bold">COMITÉ MULTIFAMILIAR DE GESTIÓN (C.M.G.) DE LA TORRE D-10</strong>, 
                 en el ejercicio de nuestras facultades como Voceros Principales del referido Comité en el Urbanismo "Simón Bolívar", 
                 Sector D, Ciudad Tiuna, por medio de la presente, hacemos constar que el (la) ciudadano (a) <strong className="font-bold uppercase">{propietarioSeleccionado.PROPIETARIO}</strong>, 
@@ -206,16 +179,15 @@ export default function GeneradorCartas() {
                 desde el mes de {propietarioSeleccionado["INICIO MES"]} del año {propietarioSeleccionado["INICIO AÑO"]}.
               </p>
 
-              <p className="mb-6 leading-[1.8]">
+              <p className="mb-5 leading-[1.7]">
                 Tiempo durante el cual, el ciudadano ha mantenido una conducta ejemplar, observando los principios de convivencia ciudadana y respeto a las normas comunitarias establecidas en la edificación.
               </p>
 
-              <p className="mb-6 leading-[1.8]">
+              <p className="mb-5 leading-[1.7]">
                 Constancia que se expide a petición de la parte interesada en la ciudad de Caracas, a los {fechaActual.diaLetras} ({fechaActual.diaNumero}) días del mes de {fechaActual.mesLetras} del año {fechaActual.anoNumero}.
               </p>
             </div>
 
-            {/* SECCIÓN INFERIOR: Firmas y Pie de página */}
             <div>
               <div className="text-center leading-[1.8]">
                 <p className="font-normal m-0 p-0">Atentamente,</p>
@@ -224,7 +196,7 @@ export default function GeneradorCartas() {
               
               <br/><br/><br/>
 
-              <div className="mb-6 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
+              <div className="mb-5 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
                 <div>
                   <p className="border-t border-black pt-2"><strong className="font-bold">Vocera Principal</strong></p>
                   <p><strong className="font-bold">Sindy Chacón</strong></p>
@@ -241,7 +213,7 @@ export default function GeneradorCartas() {
 
               <p className="text-[8pt] italic leading-relaxed mb-4"><strong className="font-bold">Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.</strong></p>
 
-              <footer className="text-center text-[10pt] pt-4 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
+              <footer className="text-center text-[10pt] pt-3 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
             </div>
           </>
         ) : (
