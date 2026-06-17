@@ -118,7 +118,10 @@ export default function GeneradorCartas() {
             value={password} 
             onChange={e => setPassword(e.target.value)} 
           />
-          <form_button type="submit" className="w-full bg-neutral-200 hover:bg-white text-black font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg">Entrar al Sistema</form_button>
+          {/* AQUÍ SE CORRIGIÓ EL ERROR "form_button" POR "button" */}
+          <button type="submit" className="w-full bg-neutral-200 hover:bg-white text-black font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg">
+            Entrar al Sistema
+          </button>
         </form>
       </div>
     );
@@ -128,23 +131,30 @@ export default function GeneradorCartas() {
   return (
     <div className="min-h-screen bg-black text-white font-serif antialiased pb-12 print:bg-white print:text-black print:p-0">
       
-      {/* CORRECCIÓN CRÍTICA DE IMPRESIÓN: Fuerza la altura automática eliminando la segunda hoja vacía */}
+      {/* CORRECCIÓN DE IMPRESIÓN PARA CELULARES Y DESKTOP */}
       <style>{`
         @media print {
           @page {
             size: letter portrait;
-            margin: 2.5cm 3cm 2.5cm 3cm; /* Márgenes estándar oficiales solicitados */
+            margin: 2.5cm 3cm 2.5cm 3cm; 
           }
           .no-print { display: none !important; }
-          body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          body { 
+            background-color: white !important; 
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+          }
           .print-area { 
             box-shadow: none !important; 
-            margin: 0 !important; 
+            margin: 0 auto !important; 
             padding: 0 !important; 
-            width: 100% !important; 
-            max-width: 100% !important;
-            min-height: auto !important; /* Corrige el desborde y elimina la segunda hoja */
-            height: auto !important;      /* Libera el alto estricto al imprimir */
+            
+            /* ESTO FUERZA AL CELULAR A CREAR EL PDF COMO SI FUERA UNA COMPUTADORA */
+            width: 800px !important; 
+            max-width: 800px !important;
+            
+            min-height: auto !important; 
+            height: auto !important;      
           }
         }
       `}</style>
@@ -231,14 +241,13 @@ export default function GeneradorCartas() {
               </p>
             </div>
 
-            {/* BLOQUE DE VALIDACIÓN E INFERIOR (ESTRUCTURA INALTERABLE) */}
+            {/* BLOQUE DE VALIDACIÓN E INFERIOR */}
             <div>
               <div className="text-center leading-[1.7]">
                 <p className="font-normal m-0 p-0">Atentamente,</p>
                 <p className="m-0 p-0"><strong className="font-bold">Comité Multifamiliar de Gestión de la TORRE D-10</strong></p>
               </div>
               
-              {/* Contenedor espaciador dinámico y seguro */}
               <div className="h-14"></div>
 
               <div className="mb-5 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
