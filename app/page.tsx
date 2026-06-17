@@ -113,7 +113,7 @@ export default function GeneradorCartas() {
               Conjunto Residencial Torre D-10
             </h1>
             <h2 className="text-xs md:text-sm text-neutral-400 uppercase tracking-widest whitespace-nowrap mt-2">
-              Urbanismo Simón Bolívar, Sector “D”, Torre D-10, Ciudad Tiuna, Coche – Caracas
+              Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas
             </h2>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function GeneradorCartas() {
           onClick={() => window.print()}
           disabled={!propietarioSeleccionado}
           className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${
-            propietarioSeleccionado ? 'bg-white hover:bg-gray-100 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
+            propietarioSeleccionado ? 'bg-white hover:bg-gray-200 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
           }`}
         >
           🖨️ Generar y Descargar PDF
@@ -185,9 +185,8 @@ export default function GeneradorCartas() {
               Constancia de Residencia
             </h2>
 
-            {/* MODIFICACIÓN: SE QUITARON LAS COMILLAS NATIVAS QUE RODEABAN LOS STRONG EN PROPIETARIO, CEDULA Y DIRECCIÓN */}
             <p className="mb-6 leading-[1.8] tracking-normal font-normal">
-              Quienes suscriben, en representación del <strong className="font-bold">“COMITÉ MULTIFAMILIAR DE GESTIÓN (C.M.G.) DE LA TORRE D-10”</strong>, 
+              Quienes suscriben, en representación del <strong className="font-bold">COMITÉ MULTIFAMILIAR DE GESTIÓN (C.M.G.) DE LA TORRE D-10</strong>, 
               en el ejercicio de nuestras facultades como Voceros Principales del referido Comité en el Urbanismo "Simón Bolívar", 
               Sector D, Ciudad Tiuna, por medio de la presente, hacemos constar que el (la) ciudadano (a) <strong className="font-bold uppercase">{propietarioSeleccionado.PROPIETARIO}</strong>, 
               titular de la cédula de identidad N° <strong className="font-bold">V-{propietarioSeleccionado.CEDULA}</strong>, de nacionalidad venezolano (a), 
@@ -203,31 +202,34 @@ export default function GeneradorCartas() {
               Constancia que se expide a petición de la parte interesada en la ciudad de Caracas, a los {fechaActual.diaLetras} ({fechaActual.diaNumero}) días del mes de {fechaActual.mesLetras} del año {fechaActual.anoNumero}.
             </p>
 
+            {/* SECCIÓN SIN COMILLAS */}
             <div className="text-center leading-[1.8]">
               <p className="font-normal m-0 p-0">Atentamente,</p>
-              <p className="m-0 p-0"><strong className="font-bold">“Comité Multifamiliar de Gestión de la “TORRE D-10””</strong></p>
+              <p className="m-0 p-0"><strong className="font-bold">Comité Multifamiliar de Gestión de la TORRE D-10</strong></p>
             </div>
             
             <br/><br/><br/><br/>
 
             <div className="mb-10 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
               <div>
-                <p className="border-t border-black pt-2"><strong className="font-bold">“Vocera Principal”</strong></p>
-                <p><strong className="font-bold">“Sindy Chacón”</strong></p>
+                <p className="border-t border-black pt-2"><strong className="font-bold">Vocera Principal</strong></p>
+                <p><strong className="font-bold">Sindy Chacón</strong></p>
                 <p>C.I V- 17.693.292</p>
                 <p>Telf. (0424) 560-15-62</p>
               </div>
               <div>
-                <p className="border-t border-black pt-2"><strong className="font-bold">“Vocero Principal”</strong></p>
-                <p><strong className="font-bold">“Marcos Díaz”</strong></p>
+                <p className="border-t border-black pt-2"><strong className="font-bold">Vocero Principal</strong></p>
+                <p><strong className="font-bold">Marcos Díaz</strong></p>
                 <p>C.I V- 16.662.440</p>
                 <p>Telf. (0414) 017-40-62</p>
               </div>
             </div>
 
-            <p className="text-[8pt] italic leading-relaxed mb-6"><strong className="font-bold">“Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.”</strong></p>
+            {/* NOTA SIN COMILLAS */}
+            <p className="text-[8pt] italic leading-relaxed mb-6"><strong className="font-bold">Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.</strong></p>
 
-            <footer className="text-center text-[10pt] mt-8 pt-4 border-t border-gray-200"><strong className="font-bold">“Urbanismo Simón Bolívar, Sector “D”, Torre D-10, Ciudad Tiuna, Coche – Caracas”</strong></footer>
+            {/* FOOTER SIN COMILLAS */}
+            <footer className="text-center text-[10pt] mt-8 pt-4 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-neutral-800 py-36 border-4 border-dashed border-neutral-200 rounded-2xl no-print">
