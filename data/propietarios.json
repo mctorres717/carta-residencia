@@ -1,0 +1,962 @@
+[
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - A",
+    "PROPIETARIO": "SINDY CHACON",
+    "CEDULA": "17.693.272",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - B",
+    "PROPIETARIO": "PEDRO DABOIN",
+    "CEDULA": "3.515.978",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - C",
+    "PROPIETARIO": "ROBERTH RUMBOS",
+    "CEDULA": "11.818.100",
+    "INICIO MES": "Abril",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - D",
+    "PROPIETARIO": "DAVID  RODRIGUEZ",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - E",
+    "PROPIETARIO": "MARÍA (LINDYS) RAMIREZ",
+    "CEDULA": "8.761.856",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - G",
+    "PROPIETARIO": "DAISY GUTIERREZ",
+    "CEDULA": "5.083.067",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 1",
+    "APARTAMENTO": "1 - H",
+    "PROPIETARIO": "JESUS  LANDAETA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - A",
+    "PROPIETARIO": "MIGUEL MOLINA",
+    "CEDULA": "20.572.685",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - B",
+    "PROPIETARIO": "YENNY  JAIMES",
+    "CEDULA": "14.984.235",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - C",
+    "PROPIETARIO": "VENUS AVILA",
+    "CEDULA": "24.134.621",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - D",
+    "PROPIETARIO": "ESTEFANIA  GARCIA",
+    "CEDULA": "19.315.012",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - E",
+    "PROPIETARIO": "HUMBERTO ROJAS",
+    "CEDULA": "5.905.868",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 -G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 2",
+    "APARTAMENTO": "2 - H",
+    "PROPIETARIO": "YETZALI BOSQUE",
+    "CEDULA": "14.198.549",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - A",
+    "PROPIETARIO": "MARIA SANCHEZ",
+    "CEDULA": "23.481.828",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - B",
+    "PROPIETARIO": "ANA DUQUE",
+    "CEDULA": "14.909.175",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - C",
+    "PROPIETARIO": "YURAIMA  BORGES",
+    "CEDULA": "17.754.189",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - D",
+    "PROPIETARIO": "ANIBAL NUÑEZ",
+    "CEDULA": "5.968.851",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - E",
+    "PROPIETARIO": "JONATHAN  ACOSTA",
+    "CEDULA": "17.478.331",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 3",
+    "APARTAMENTO": "3 - H",
+    "PROPIETARIO": "ENDRICK RODRIGUEZ",
+    "CEDULA": "15.758.332",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - A",
+    "PROPIETARIO": "LUISA ENCARGADA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - B",
+    "PROPIETARIO": "GREILYMAR PEREIRA",
+    "CEDULA": "21.102.326",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - C",
+    "PROPIETARIO": "CARHMENT ZAMORA",
+    "CEDULA": "22.856.434",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - D",
+    "PROPIETARIO": "DREISY CHACON",
+    "CEDULA": "20.303.405",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - E",
+    "PROPIETARIO": "JUAN CARLOS ACOSTA",
+    "CEDULA": "13.692.620",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 4",
+    "APARTAMENTO": "4 - H",
+    "PROPIETARIO": "MIRIAM GONZALEZ",
+    "CEDULA": "23.687.346",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - A",
+    "PROPIETARIO": "DAYANA  POMPA",
+    "CEDULA": "20.595.018",
+    "INICIO MES": "Febrero",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - B",
+    "PROPIETARIO": "DARWIN APONTE",
+    "CEDULA": "16.177.433",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - C",
+    "PROPIETARIO": "MARIA MENDEZ",
+    "CEDULA": "14.965.223",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - D",
+    "PROPIETARIO": "NOEL RODRIGUEZ",
+    "CEDULA": "20.223.137",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - E",
+    "PROPIETARIO": "CARMEN PORTOCARRERO",
+    "CEDULA": "22.748.835",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 5",
+    "APARTAMENTO": "5 - H",
+    "PROPIETARIO": "EDGAR MIRELES",
+    "CEDULA": "18.752.610",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - A",
+    "PROPIETARIO": "YAMILET MACAYO",
+    "CEDULA": "14.362.865",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - B",
+    "PROPIETARIO": "LUDERCY MERIDA",
+    "CEDULA": "15.585.119",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - C",
+    "PROPIETARIO": "YEYNY HERRERA",
+    "CEDULA": "15.027.982",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - D",
+    "PROPIETARIO": "LILIANA GUTIERREZ",
+    "CEDULA": "6.510.135",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - E",
+    "PROPIETARIO": "MARIA ESTELA  GARCIA",
+    "CEDULA": "16.380.522",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 6",
+    "APARTAMENTO": "6 - H",
+    "PROPIETARIO": "SAMUEL",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Marzo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - A",
+    "PROPIETARIO": "CARLA PERNIA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - B",
+    "PROPIETARIO": "NEURIS SALAS",
+    "CEDULA": "17.148.434",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - C",
+    "PROPIETARIO": "SEVERIS  CARABALLO",
+    "CEDULA": "18.092.245",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - D",
+    "PROPIETARIO": "PEDRO ROJAS",
+    "CEDULA": "17.779.631",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - E",
+    "PROPIETARIO": "JHONATHAN PEREZ",
+    "CEDULA": "19.043.462",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - F",
+    "PROPIETARIO": "FONEE (MATUTE)",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - G",
+    "PROPIETARIO": "FONEE (LUISAURA)",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 7",
+    "APARTAMENTO": "7 - H",
+    "PROPIETARIO": "FRANCISCO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Marzo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - A",
+    "PROPIETARIO": "IRANIA VAAMONDE",
+    "CEDULA": "14.062.065",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - B",
+    "PROPIETARIO": "JULIA CAMACARO",
+    "CEDULA": "16.769.313",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - C",
+    "PROPIETARIO": "OLGA VALLETA",
+    "CEDULA": "12.296.547",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - D",
+    "PROPIETARIO": "TUSEN ELVIN",
+    "CEDULA": "15.343.410",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - E",
+    "PROPIETARIO": "CARLOS",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Marzo",
+    "INICIO AÑO": 2026
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - F",
+    "PROPIETARIO": "FONEE (JESUS MURILLO)",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - G",
+    "PROPIETARIO": "FONEE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 8",
+    "APARTAMENTO": "8 - H",
+    "PROPIETARIO": "JOHANNY CASTILLO",
+    "CEDULA": "20.278.738",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - A",
+    "PROPIETARIO": "GILBERTO ESCALONA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Febrero",
+    "INICIO AÑO": 2026
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - B",
+    "PROPIETARIO": "GABRIELINA  HERNANDEZ",
+    "CEDULA": "13.325.204",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - C",
+    "PROPIETARIO": "NELLY VERGARA",
+    "CEDULA": "12.258.096",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - D",
+    "PROPIETARIO": "JHESIKA TORRES",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - E",
+    "PROPIETARIO": "WILDER ORTUÑO",
+    "CEDULA": "19.226.174",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - F",
+    "PROPIETARIO": "FONEE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - G",
+    "PROPIETARIO": "FONEE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 9",
+    "APARTAMENTO": "9 - H",
+    "PROPIETARIO": "BLANCA VEGAS",
+    "CEDULA": "10.893.896",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - A",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - B",
+    "PROPIETARIO": "MILDRED NATERA",
+    "CEDULA": "17.743.531",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - C",
+    "PROPIETARIO": "RICHARD PEREZ",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - D",
+    "PROPIETARIO": "VICTORIA CEBALLOS",
+    "CEDULA": "20.524.940",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - E",
+    "PROPIETARIO": "ARGENIS",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Marzo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - F",
+    "PROPIETARIO": "FONEE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - G",
+    "PROPIETARIO": "FONEE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 10",
+    "APARTAMENTO": "10 - H",
+    "PROPIETARIO": "ANABEL GONZALEZ",
+    "CEDULA": "27.234.627",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - A",
+    "PROPIETARIO": "LUISA ENCARGADA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - B",
+    "PROPIETARIO": "MADELEIN GARCIA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - C",
+    "PROPIETARIO": "JORGE",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Julio",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - D",
+    "PROPIETARIO": "MARGARITA  ALDANA",
+    "CEDULA": "5.769.307",
+    "INICIO MES": "Abril",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - E",
+    "PROPIETARIO": "NATHALI PULIDO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - F",
+    "PROPIETARIO": "ARELIS CAMACHO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Junio",
+    "INICIO AÑO": 2026
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - G",
+    "PROPIETARIO": "CARLOS",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Febrero",
+    "INICIO AÑO": 2026
+  },
+  {
+    "PISO": "PISO 11",
+    "APARTAMENTO": "11 - H",
+    "PROPIETARIO": "MARTA DURAN",
+    "CEDULA": "13.969.245",
+    "INICIO MES": "Diciembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - A",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - B",
+    "PROPIETARIO": "JOHANNA SILVA",
+    "CEDULA": "14.388.139",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - C",
+    "PROPIETARIO": "JOSE BAUTISTA",
+    "CEDULA": "26.043.175",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - D",
+    "PROPIETARIO": "JHOSELYN SANCHEZ",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - E",
+    "PROPIETARIO": "GUSTAVO PAREDES",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - G",
+    "PROPIETARIO": "LEYIBEL CATANAIMA",
+    "CEDULA": "12.096.028",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 12",
+    "APARTAMENTO": "12 - H",
+    "PROPIETARIO": "KRIS CARRASCO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Enero",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - A",
+    "PROPIETARIO": "CARLOS CASTILLO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Octubre",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - B",
+    "PROPIETARIO": "MAX ROBERT TORRES",
+    "CEDULA": "20.126.566",
+    "INICIO MES": "Junio",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - C",
+    "PROPIETARIO": "EDULAIS RODRIGUEZ",
+    "CEDULA": "21.253.947",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - D",
+    "PROPIETARIO": "WILMER ALVARADO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - E",
+    "PROPIETARIO": "HECTOR  ROJAS",
+    "CEDULA": "12.040.131",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - F",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - G",
+    "PROPIETARIO": "CESAR  CARREÑO",
+    "CEDULA": "20.602.496",
+    "INICIO MES": "Febrero",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 13",
+    "APARTAMENTO": "13 - H",
+    "PROPIETARIO": "JOHAN RODRIGUEZ",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - A",
+    "PROPIETARIO": "JOSE DIAZ",
+    "CEDULA": "17.085.052",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - B",
+    "PROPIETARIO": "CESAR  CABELLO",
+    "CEDULA": "16.711.637",
+    "INICIO MES": "Junio",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - C",
+    "PROPIETARIO": "CARLOS GIL",
+    "CEDULA": "15.403.246",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2023
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - D",
+    "PROPIETARIO": "GABRIEL SALAZAR",
+    "CEDULA": "11.829.530",
+    "INICIO MES": "Abril",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - E",
+    "PROPIETARIO": "BETZAY BUSTILLOS",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Septiembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - F",
+    "PROPIETARIO": "RICARDO LEON",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Marzo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 14",
+    "APARTAMENTO": "14 - H",
+    "PROPIETARIO": "VICTOR SOTO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Noviembre",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - A",
+    "PROPIETARIO": "MARCO TULIO",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Agosto",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - B",
+    "PROPIETARIO": "ARGENIS ARAMBULE",
+    "CEDULA": "20.081.840",
+    "INICIO MES": "Junio",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - C",
+    "PROPIETARIO": "ISMAEL PALENCIA",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - D",
+    "PROPIETARIO": "JOUSEBIO DOS RAMOS",
+    "CEDULA": "16.814.136",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - E",
+    "PROPIETARIO": "RAUL SALAZAR",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Junio",
+    "INICIO AÑO": 2024
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - F",
+    "PROPIETARIO": "MARIA MERCEDES",
+    "CEDULA": "FALTA CEDULA",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2025
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - G",
+    "PROPIETARIO": "VACIO",
+    "CEDULA": "VACIO",
+    "INICIO MES": "Vacio",
+    "INICIO AÑO": null
+  },
+  {
+    "PISO": "PISO 15",
+    "APARTAMENTO": "15 - H",
+    "PROPIETARIO": "CATHERINE MOYA",
+    "CEDULA": "23.946.849",
+    "INICIO MES": "Mayo",
+    "INICIO AÑO": 2024
+  }
+]
