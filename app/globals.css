@@ -1,29 +1,43 @@
 @import "tailwindcss";
 
+/* --- ESTILOS PROFESIONALES DE IMPRESIÓN PDF D-10 --- */
+
 @media print {
+  /* 1. Limpieza Total: Elimina cabeceras y pies de página predeterminados */
   @page {
-    size: A4 portrait;
-    margin: 2cm; /* Margen general de la hoja */
+    margin: 0;
+    size: auto;
   }
 
+  /* 2. Reseteo Global para Impresión */
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
     color: black !important;
-    width: 100%;
-    height: 100%;
+    height: auto;
   }
 
-  .no-print { display: none !important; }
+  /* 3. Definición de Márgenes Físicos Exactos del Documento */
+  body {
+    padding-top: 2.5cm !important;
+    padding-bottom: 2.5cm !important;
+    padding-left: 3cm !important;
+    padding-right: 3cm !important;
+    font-family: Arial, sans-serif !important; 
+  }
 
+  /* 4. Oculta elementos de la Interfaz de Usuario */
+  .no-print {
+    display: none !important;
+  }
+
+  /* 5. Fuerza que el área de impresión use todo el ancho disponible */
   .print-area {
     display: block !important;
     width: 100% !important;
+    box-shadow: none !important;
+    background: white !important;
     padding: 0 !important;
-    margin: 0 !important;
-    /* Fuerza al contenedor a no exceder el alto de la hoja */
-    height: 100vh;
-    box-sizing: border-box;
   }
 }
