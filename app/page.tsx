@@ -173,7 +173,7 @@ export default function GeneradorCartas() {
         </button>
       </div>
 
-      <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-0 p-0 shadow-nonemin-h-[90vh] flex flex-col justify-between font-serif text-[12pt]">
+      <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] font-serif text-justify text-[12pt]">
         {propietarioSeleccionado ? (
           <div>
             <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-8">
@@ -229,7 +229,7 @@ export default function GeneradorCartas() {
             <p className="text-[8pt] italic leading-relaxed mb-6"><strong className="font-bold">Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.</strong></p>
 
             {/* FOOTER SIN COMILLAS */}
-            <footer className="text-center text-[10pt] mt-auto pt-4 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
+            <footer className="text-center text-[10pt] mt-8 pt-4 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-neutral-800 py-36 border-4 border-dashed border-neutral-200 rounded-2xl no-print">
