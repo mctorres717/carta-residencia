@@ -3,14 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import propietariosData from '../data/propietarios.json';
 
+// Función auxiliar para traducir números de días a letras legales
 const numeroALetras = (num: number): string => {
-  const unidades = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve', 'treinta', 'treinta y un'];
+  const unidades = [
+    'cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
+    'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte',
+    'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve', 'treinta', 'treinta y un'
+  ];
   return unidades[num] || num.toString();
 };
 
-const mesesLetras = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const mesesLetras = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+];
 
 export default function GeneradorCartas() {
+  // Estados de la Aplicación
   const [isLogged, setIsLogged] = useState(false);
   const [password, setPassword] = useState('');
   const [buscar, setBuscar] = useState('');
@@ -19,6 +28,7 @@ export default function GeneradorCartas() {
   const [fechaManual, setFechaManual] = useState('');
   const [fechaActual, setFechaActual] = useState({ diaLetras: '', diaNumero: 0, mesLetras: '', anoNumero: 2026 });
 
+  // Inicializar la fecha con el día de hoy
   useEffect(() => {
     const hoy = new Date();
     actualizarFecha(hoy);
@@ -42,10 +52,14 @@ export default function GeneradorCartas() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'admin2026') { setIsLogged(true); }
-    else alert('Clave de acceso denegada.');
+    if (password === 'admin2026') {
+      setIsLogged(true);
+    } else {
+      alert('Clave de acceso denegada.');
+    }
   };
 
+  // Filtrado del buscador híbrido
   const listaFiltrada = propietariosData.filter((item: any) =>
     item.APARTAMENTO?.toString().toLowerCase().includes(buscar.toLowerCase()) ||
     item.PROPIETARIO?.toString().toLowerCase().includes(buscar.toLowerCase())
@@ -57,24 +71,37 @@ export default function GeneradorCartas() {
     setIsOpen(false);
   };
 
+  // Función de impresión con nomenclatura dinámica restaurada y blindada
   const handlePrint = () => {
     if (!propietarioSeleccionado) return;
     
-    const partesNombre = propietarioSeleccionado.PROPIETARIO.trim().split(' ');
+    // Extracción estricta de Primer Nombre y Primer Apellido
+    const partesNombre = propietarioSeleccionado.PROPIETARIO.trim().split(/\s+/);
     const primerNombre = partesNombre[0] || '';
     const primerApellido = partesNombre.length > 1 ? partesNombre[1] : '';
     const nombreFormateado = `${primerNombre} ${primerApellido}`.trim();
     
-    const fechaDescarga = new Date().toLocaleDateString('es-VE').replace(/\//g, '-');
+    // Formatear la fecha actual de descarga (dd-mm-yyyy)
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const ano = hoy.getFullYear();
+    const fechaDescarga = `${dia}-${mes}-${ano}`;
     
+    // Aplicar la nomenclatura solicitada al título del documento
     const tituloOriginal = document.title;
     document.title = `Carta de Residencia – ${nombreFormateado} – Apto ${propietarioSeleccionado.APARTAMENTO} – ${fechaDescarga}`;
     
+    // Disparar la impresión nativa
     window.print();
     
-    setTimeout(() => { document.title = tituloOriginal; }, 1000);
+    // Restaurar el título original de la pestaña web un segundo después
+    setTimeout(() => {
+      document.title = tituloOriginal;
+    }, 1000);
   };
 
+  // Renderizado de la pantalla de Login (Fondo Negro Ejecutivo)
   if (!isLogged) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4 font-serif">
@@ -83,36 +110,44 @@ export default function GeneradorCartas() {
             <img src="/ministerio.png" alt="Min" className="h-12 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display='none'} />
             <img src="/logo_edificio.png" alt="Torre D10" className="h-12 w-auto object-contain opacity-90" onError={(e) => e.currentTarget.style.display='none'} />
           </div>
-          <h1 className="text-xl font-bold text-center text-white uppercase tracking-widest mb-6">Portal Administrativo</h1>
-          <input type="password" placeholder="Clave de administrador" className="w-full bg-black border border-neutral-800 rounded-lg p-4 text-center text-white font-bold tracking-widest outline-none focus:border-neutral-500 mb-6 transition-colors" value={password} onChange={e => setPassword(e.target.value)} />
+          <h1 className="text-xl font-bold text-center text-white uppercase tracking-widest mb-6">Portal Administrative</h1>
+          <input 
+            type="password" 
+            placeholder="Clave de administrador" 
+            className="w-full bg-black border border-neutral-800 rounded-lg p-4 text-center text-white font-bold tracking-widest outline-none focus:border-neutral-500 mb-6 transition-colors" 
+            value={password} 
+            onChange={e => setPassword(e.target.value)} 
+          />
           <button type="submit" className="w-full bg-neutral-200 hover:bg-white text-black font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg">Entrar al Sistema</button>
         </form>
       </div>
     );
   }
 
+  // Interfaz de Usuario Principal
   return (
     <div className="min-h-screen bg-black text-white font-serif antialiased pb-12 print:bg-white print:text-black print:p-0">
       
-      {/* CSS MAGISTRAL: Mantiene la vista previa hermosa y configura la impresora perfecto */}
+      {/* CSS DE IMPRESIÓN CONFIGURADO A TAMAÑO CARTA ESTÁNDAR Y PROFESIONAL */}
       <style>{`
         @media print {
           @page {
             size: letter portrait;
-            margin: 2.5cm 3cm 2.5cm 3cm; /* Superior 2.5, Inferior 2.5, Izquierda 3, Derecha 3 */
+            margin: 2.5cm 3cm 2.5cm 3cm; /* Margen Estándar Profesional: Superior/Inferior 2.5cm, Izquierda/Derecha 3cm */
           }
           .no-print { display: none !important; }
           body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .print-area { 
             box-shadow: none !important; 
             margin: 0 !important; 
-            padding: 0 !important; /* Eliminamos el padding visual para usar el margen real de la impresora */
+            padding: 0 !important; /* Elimina el padding de pantalla para respetar el margen de la impresora */
             width: 100% !important; 
             max-width: 100% !important;
           }
         }
       `}</style>
       
+      {/* HEADER EN EL PORTAL WEB */}
       <header className="no-print bg-neutral-900 border-b border-neutral-800 py-6 px-4 shadow-xl">
         <div className="max-w-4xl mx-auto flex flex-col">
           <div className="flex justify-between items-start mb-6">
@@ -129,6 +164,7 @@ export default function GeneradorCartas() {
         </div>
       </header>
 
+      {/* PANEL DE CONTROL DEL BUSCADOR */}
       <div className="no-print max-w-3xl mx-auto pt-8 px-4">
         <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-6 items-end relative z-30">
           <div className="w-full md:w-2/3 relative">
@@ -139,12 +175,16 @@ export default function GeneradorCartas() {
             </div>
             {isOpen && (
               <ul className="absolute left-0 right-0 mt-2 max-h-60 bg-black border border-neutral-800 rounded-xl overflow-y-auto shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
-                {listaFiltrada.map((item: any, idx: number) => (
-                  <li key={idx} onClick={() => seleccionarPropietario(item)} className="p-4 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white cursor-pointer flex justify-between items-center transition-colors">
-                    <span className="font-bold bg-neutral-900 px-3 py-1 rounded text-white border border-neutral-800">{item.APARTAMENTO}</span>
-                    <span className="text-xs truncate max-w-[200px] uppercase font-mono">{item.PROPIETARIO}</span>
-                  </li>
-                ))}
+                {listaFiltrada.length > 0 ? (
+                  listaFiltrada.map((item: any, idx: number) => (
+                    <li key={idx} onClick={() => seleccionarPropietario(item)} className="p-4 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white cursor-pointer flex justify-between items-center transition-colors">
+                      <span className="font-bold bg-neutral-900 px-3 py-1 rounded text-white border border-neutral-800">{item.APARTAMENTO}</span>
+                      <span className="text-xs truncate max-w-[200px] uppercase font-mono">{item.PROPIETARIO}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="p-4 text-sm text-neutral-500 text-center">No se encontraron registros</li>
+                )}
               </ul>
             )}
           </div>
@@ -156,10 +196,11 @@ export default function GeneradorCartas() {
         <button onClick={handlePrint} disabled={!propietarioSeleccionado} className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${propietarioSeleccionado ? 'bg-white hover:bg-gray-200 text-black active:scale-[0.98]' : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'}`}>🖨️ Generar y Descargar PDF</button>
       </div>
 
-      {/* VISTA PREVIA HERMOSA: El p-[2.5cm] hace que en pantalla se vea como una hoja real */}
+      {/* VISTA PREVIA IMPE cables (P-[2.5CM] SIMULA LA HOJA REAL EN PANTALLA) */}
       <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] font-serif text-[12pt] text-justify flex flex-col justify-between">
         {propietarioSeleccionado ? (
           <>
+            {/* BLOQUE SUPERIOR DE LA CARTA */}
             <div>
               <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-8">
                 <img src="/ministerio.png" alt="Ministerio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
@@ -188,13 +229,15 @@ export default function GeneradorCartas() {
               </p>
             </div>
 
+            {/* BLOQUE INFERIOR DE LA CARTA: CONTROL DE ESPACIOS OPTIMIZADO PARA EVITAR LA SEGUNDA HOJA */}
             <div>
-              <div className="text-center leading-[1.8]">
+              <div className="text-center leading-[1.7]">
                 <p className="font-normal m-0 p-0">Atentamente,</p>
                 <p className="m-0 p-0"><strong className="font-bold">Comité Multifamiliar de Gestión de la TORRE D-10</strong></p>
               </div>
               
-              <br/><br/><br/>
+              {/* Espacio controlado en lugar de <br/> libres para asegurar la hoja única */}
+              <div className="h-14"></div>
 
               <div className="mb-5 font-normal grid grid-cols-2 gap-x-12 text-center text-[11pt]">
                 <div>
