@@ -1,16 +1,12 @@
-/* src/app/globals.css */
-
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
 
 /* --- ESTILOS PROFESIONALES DE IMPRESIÓN PDF D-10 --- */
 
 @media print {
-  /* 1. Limpieza Total: Elimina cabeceras y pies de página predeterminados del navegador (link, fecha, hora) */
+  /* 1. Limpieza Total: Elimina cabeceras y pies de página predeterminados */
   @page {
     margin: 0;
-    size: auto; /* Permite que el CSS maneje el tamaño */
+    size: auto;
   }
 
   /* 2. Reseteo Global para Impresión */
@@ -24,15 +20,10 @@
 
   /* 3. Definición de Márgenes Físicos Exactos del Documento */
   body {
-    /* Superior: 2.5cm, Inferior: 2.5cm */
     padding-top: 2.5cm !important;
     padding-bottom: 2.5cm !important;
-    
-    /* Izquierdo: 3cm, Derecho: 3cm */
     padding-left: 3cm !important;
     padding-right: 3cm !important;
-    
-    /* Asegura que la fuente Serif Ejecutiva se mantenga */
     font-family: Arial, sans-serif !important; 
   }
 
@@ -47,6 +38,6 @@
     width: 100% !important;
     box-shadow: none !important;
     background: white !important;
-    padding: 0 !important; /* El margen real lo maneja el body */
+    padding: 0 !important;
   }
 }
