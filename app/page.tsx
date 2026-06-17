@@ -228,7 +228,7 @@ export default function GeneradorCartas() {
             {/* NOTA SIN COMILLAS */}
             <p className="text-[8pt] italic leading-relaxed mb-6"><strong className="font-bold">Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.</strong></p>
 
-            {/* El Footer se mantendrá pegado al fondo gracias al flex-col y justify-between */}
+            {/* FOOTER SIN COMILLAS */}
             <footer className="text-center text-[10pt] mt-auto pt-4 border-t border-gray-200"><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
           </div>
         ) : (
