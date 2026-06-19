@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // --- CONEXIÓN A SUPABASE ---
@@ -9,562 +9,377 @@ const supabase = createClient(
   'sb_publishable_DH68PA1DWbc66PALwVDyXA_dHLQPrL1'
 );
 
-// --- TIPOS ACTUALIZADOS CON LAS NUEVAS PESTAÑAS ---
-type TabType = 'RESUMEN' | 'BUSQUEDA' | 'BASE_DATOS' | 'GASTOS_GRAL' | 'GASTOS_MENSUAL' | 'EMISION_OFICIAL' | 'GESTION_DATOS';
+const numeroALetras = (num: number): string => {
+  const unidades = ['cero', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve', 'treinta', 'treinta y un'];
+  return unidades[num] || num.toString();
+};
 
-// --- CONSTANTES DEL NEGOCIO ---
-const CUOTA_MENSUAL_USD = 10.00;
-const ANO_INICIO_OPERACIONES = 2025;
-const MES_INICIO_OPERACIONES = 0; // 0 = Enero en JavaScript
+const mesesLetras = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const anioActual = new Date().getFullYear();
+const listaAnios = Array.from({ length: anioActual - 2010 + 1 }, (_, i) => anioActual - i);
 
-export default function FinanzasTorreD10() {
-  const [isAuth, setIsAuth] = useState(false);
-  const [pin, setPin] = useState('');
-  const [activeTab, setActiveTab] = useState<TabType>('RESUMEN');
+export default function SistemaTorreD10() {
+  const [isLogged, setIsLogged] = useState(false);
+  const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState<'CARTA' | 'ACTUALIZAR'>('CARTA');
+  
+  const [propietarios, setPropietarios] = useState<any[]>([]);
+  const [buscar, setBuscar] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [propietarioSeleccionado, setPropietarioSeleccionado] = useState<any>(null);
+  const [fechaManual, setFechaManual] = useState('');
+  const [fechaActual, setFechaActual] = useState({ diaLetras: '', diaNumero: 0, mesLetras: '', anoNumero: 2026 });
 
-  const [transacciones, setTransacciones] = useState<any[]>([]);
-  const [pagosResidentes, setPagosResidentes] = useState<any[]>([]);
-
-  const [formGasto, setFormGasto] = useState({ anio: new Date().getFullYear().toString(), mes: '', referencia: '', descripcion: '', gasto_usd: '', gasto_bs: '' });
-  const [formPagoResidente, setFormPagoResidente] = useState({ apartamento: '', meses_seleccionados: [] as string[], anio_correspondiente: new Date().getFullYear().toString(), monto_pagado_usd: '', monto_pagado_bs: '', descripcion: '' });
-
-  const [filtroAnio, setFiltroAnio] = useState('');
-  const [filtroMes, setFiltroMes] = useState('');
-  const [filtroPiso, setFiltroPiso] = useState('');
-  const [filtroApto, setFiltroApto] = useState('');
-
-  const [filtroAptoTab2, setFiltroAptoTab2] = useState('');
-  const [filtroMesTab5, setFiltroMesTab5] = useState('');
-  const [filtroAnioTab5, setFiltroAnioTab5] = useState(new Date().getFullYear().toString());
-
-  const listaApartamentos = Array.from({ length: 14 }, (_, p) => ['A', 'B', 'C', 'D'].map(letra => `${p + 1}-${letra}`)).flat();
-  const mesesDelAno = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const [editingProp, setEditingProp] = useState<any>(null);
+  const [pisoActivo, setPisoActivo] = useState('TODOS');
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('finanzasAuth') === 'true') setIsAuth(true);
+    const hoy = new Date();
+    actualizarFecha(hoy);
+    setFechaManual(hoy.toISOString().split('T')[0]);
+    fetchPropietarios();
+
+    const channel = supabase.channel('cambios-d10')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'propietarios_d10' }, fetchPropietarios)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  useEffect(() => {
-    if (!isAuth) return;
-    let inactivityTimeout: NodeJS.Timeout;
-    const resetInactivityTimer = () => {
-      clearTimeout(inactivityTimeout);
-      inactivityTimeout = setTimeout(() => { alert('Tu sesión ha expirado por inactividad.'); handleLogout(); }, 5 * 60 * 1000);
-    };
-    const userEvents = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
-    userEvents.forEach(event => window.addEventListener(event, resetInactivityTimer));
-    resetInactivityTimer();
-    return () => { clearTimeout(inactivityTimeout); userEvents.forEach(event => window.removeEventListener(event, resetInactivityTimer)); };
-  }, [isAuth]);
-
-  useEffect(() => {
-    if (isAuth) { fetchTransacciones(); fetchPagosResidentes(); }
-  }, [isAuth]);
-
-  const fetchTransacciones = async () => {
-    const { data } = await supabase.from('finanzas_d10').select('*').order('fecha', { ascending: true }).order('id', { ascending: true });
+  const fetchPropietarios = async () => {
+    const { data } = await supabase.from('propietarios_d10').select('*');
     if (data) {
-      let saldoAcumuladoUSD = 0; let saldoAcumuladoBs = 0;
-      setTransacciones(data.map(t => {
-        saldoAcumuladoUSD += (Number(t.ingreso_usd) - Number(t.gasto_usd));
-        saldoAcumuladoBs += (Number(t.ingreso_bs) - Number(t.gasto_bs));
-        return { ...t, saldo_usd: saldoAcumuladoUSD, saldo_bs: saldoAcumuladoBs };
-      }));
+      const ordenados = data.sort((a, b) => a.apartamento.localeCompare(b.apartamento, undefined, { numeric: true, sensitivity: 'base' }));
+      setPropietarios(ordenados);
     }
   };
 
-  const fetchPagosResidentes = async () => {
-    const { data } = await supabase.from('pagos_residentes').select('*').order('created_at', { ascending: true });
-    if (data) setPagosResidentes(data);
+  const actualizarFecha = (fecha: Date) => {
+    setFechaActual({
+      diaLetras: numeroALetras(fecha.getDate()),
+      diaNumero: fecha.getDate(),
+      mesLetras: mesesLetras[fecha.getMonth()],
+      anoNumero: fecha.getFullYear()
+    });
+  };
+
+  const handleCambioFecha = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFechaManual(e.target.value);
+    const nuevaFecha = new Date(e.target.value + 'T12:00:00');
+    actualizarFecha(nuevaFecha);
   };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin === 'admin') { setIsAuth(true); if (typeof window !== 'undefined') localStorage.setItem('finanzasAuth', 'true'); }
+    // AQUÍ PUEDES CAMBIAR LA CLAVE DE ACCESO
+    if (password === 'admin2026') setIsLogged(true);
     else alert('Clave de acceso denegada.');
   };
 
-  const handleLogout = () => { setIsAuth(false); setPin(''); if (typeof window !== 'undefined') localStorage.removeItem('finanzasAuth'); };
-
-  // --- BOTONES DE ELIMINAR (DELETE) ---
-  const handleEliminarTransaccion = async (id: number) => {
-    if (!window.confirm("⚠️ ¿Estás seguro de eliminar este movimiento? Esta acción recalculará los saldos y es irreversible.")) return;
-    const { error } = await supabase.from('finanzas_d10').delete().eq('id', id);
-    if (error) alert("Error al eliminar: " + error.message);
-    else { alert("✅ Registro eliminado exitosamente."); fetchTransacciones(); }
-  };
-
-  const handleEliminarPagoResidente = async (id: number) => {
-    if (!window.confirm("⚠️ ¿Estás seguro de eliminar este recibo de pago? Esto afectará el estado de cuenta del propietario.")) return;
-    const { error } = await supabase.from('pagos_residentes').delete().eq('id', id);
-    if (error) alert("Error al eliminar: " + error.message);
-    else { alert("✅ Recibo eliminado exitosamente."); fetchPagosResidentes(); }
-  };
-
-  const handleRegistrarMovimiento = async (e: React.FormEvent) => {
+  const handleSavePropietario = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formGasto.anio || !formGasto.mes || !formGasto.descripcion) return alert("Año, Mes y Descripción son obligatorios.");
-    const payload = { fecha: new Date().toISOString(), anio: formGasto.anio, mes: formGasto.mes, referencia: formGasto.referencia || 'N/A', descripcion: formGasto.descripcion, ingreso_usd: 0, gasto_usd: Number(formGasto.gasto_usd)||0, ingreso_bs: 0, gasto_bs: Number(formGasto.gasto_bs)||0 };
-    const { error } = await supabase.from('finanzas_d10').insert([payload]);
-    if (error) alert(`Error: ${error.message}`);
-    else { alert("✅ Gasto registrado en el Libro Diario."); setFormGasto({ anio: new Date().getFullYear().toString(), mes: '', referencia: '', descripcion: '', gasto_usd: '', gasto_bs: '' }); fetchTransacciones(); }
-  };
+    const { error } = await supabase
+      .from('propietarios_d10')
+      .update({
+        propietario: editingProp.propietario,
+        cedula: editingProp.cedula,
+        piso: editingProp.piso,
+        inicio_mes: editingProp.inicio_mes,
+        inicio_ano: editingProp.inicio_ano
+      })
+      .eq('id', editingProp.id);
 
-  const handleRegistrarPagoResidente = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formPagoResidente.apartamento || formPagoResidente.meses_seleccionados.length === 0) return alert("Selecciona el Apartamento y al menos un Mes.");
-
-    const pisoCalculado = formPagoResidente.apartamento.split('-')[0];
-    const mUSD = Number(formPagoResidente.monto_pagado_usd) || 0;
-    const mBS = Number(formPagoResidente.monto_pagado_bs) || 0;
-    const estatusCalculado = (mUSD > 0 || mBS > 0) ? 'PAGADO' : 'PENDIENTE';
-    const mesesUnidos = formPagoResidente.meses_seleccionados.join(', ');
-
-    const payloadResidente = {
-      apartamento: formPagoResidente.apartamento, piso: pisoCalculado, mes_correspondiente: mesesUnidos, anio_correspondiente: formPagoResidente.anio_correspondiente,
-      monto_pagado_usd: mUSD, monto_pagado_bs: mBS, estatus_solvencia: estatusCalculado, descripcion: formPagoResidente.descripcion || `Abono de condominio`
-    };
-
-    const { error: errorResidente } = await supabase.from('pagos_residentes').insert([payloadResidente]);
-    if (errorResidente) return alert(`Error en Residentes: ${errorResidente.message}`);
-
-    if (mUSD > 0 || mBS > 0) {
-      const payloadLibroDiario = {
-        fecha: new Date().toISOString(), anio: formPagoResidente.anio_correspondiente, mes: formPagoResidente.meses_seleccionados[formPagoResidente.meses_seleccionados.length - 1],
-        referencia: `Apto ${formPagoResidente.apartamento}`, descripcion: `Ingreso Condominio: ${formPagoResidente.descripcion || mesesUnidos}`,
-        ingreso_usd: mUSD, gasto_usd: 0, ingreso_bs: mBS, gasto_bs: 0
-      };
-      await supabase.from('finanzas_d10').insert([payloadLibroDiario]);
+    if (error) alert(`Error al guardar: ${error.message}`);
+    else {
+      alert(`Datos del apartamento ${editingProp.apartamento} actualizados con éxito.`);
+      setEditingProp(null);
+      fetchPropietarios();
     }
-
-    alert(`✅ Abono registrado. Libro Mayor actualizado.`);
-    setFormPagoResidente({ apartamento: '', meses_seleccionados: [], anio_correspondiente: new Date().getFullYear().toString(), monto_pagado_usd: '', monto_pagado_bs: '', descripcion: '' });
-    fetchPagosResidentes(); fetchTransacciones();
   };
 
-  const toggleMes = (mes: string) => {
-    setFormPagoResidente(prev => {
-      const seleccionados = prev.meses_seleccionados.includes(mes) ? prev.meses_seleccionados.filter(m => m !== mes) : [...prev.meses_seleccionados, mes];
-      seleccionados.sort((a, b) => mesesDelAno.indexOf(a) - mesesDelAno.indexOf(b));
-      return { ...prev, meses_seleccionados: seleccionados };
-    });
-  };
+  const handlePrint = () => {
+    if (!propietarioSeleccionado) return;
+    const partesNombre = propietarioSeleccionado.propietario.trim().split(/\s+/);
+    const primerNombre = partesNombre[0] || '';
+    let primerApellido = '';
+    if (partesNombre.length === 2) primerApellido = partesNombre[1];
+    else if (partesNombre.length >= 3) primerApellido = partesNombre[2];
 
-  const handlePrint = (titulo: string) => { const original = document.title; document.title = titulo; window.print(); setTimeout(() => { document.title = original; }, 1000); };
-  const formatMoney = (amount: number) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-
-  const totalIngresoUSD = transacciones.reduce((acc, t) => acc + Number(t.ingreso_usd), 0);
-  const totalGastoUSD = transacciones.reduce((acc, t) => acc + Number(t.gasto_usd), 0);
-  const saldoActualUSD = transacciones.length > 0 ? transacciones[transacciones.length - 1].saldo_usd : 0;
-  const totalIngresoBs = transacciones.reduce((acc, t) => acc + Number(t.ingreso_bs), 0);
-  const totalGastoBs = transacciones.reduce((acc, t) => acc + Number(t.gasto_bs), 0);
-  const saldoActualBs = transacciones.length > 0 ? transacciones[transacciones.length - 1].saldo_bs : 0;
-
-  // --- MOTOR DE CONCILIACIÓN CRONOLÓGICA (PESTAÑA 2) ---
-  const estadoDeCuentaGenerado = useMemo(() => {
-    if (!filtroAptoTab2) return { lineas: [], deudaTotalUSD: 0, totalAbonadoUSD: 0, totalAbonadoBs: 0 };
+    const nombreFormateado = `${primerNombre} ${primerApellido}`.trim();
+    const hoy = new Date();
+    const fechaDescarga = `${String(hoy.getDate()).padStart(2, '0')}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${hoy.getFullYear()}`;
     
-    const pagosDelApto = pagosResidentes.filter(p => p.apartamento === filtroAptoTab2);
-    const mapaPagos = new Map();
-    let totalPagadoU = 0;
-    let totalPagadoB = 0;
+    const tituloOriginal = document.title;
+    document.title = `Carta de Residencia – ${nombreFormateado} – Apto ${propietarioSeleccionado.apartamento} – ${fechaDescarga}`;
+    window.print();
+    setTimeout(() => { document.title = tituloOriginal; }, 1000);
+  };
 
-    pagosDelApto.forEach(p => {
-      totalPagadoU += Number(p.monto_pagado_usd);
-      totalPagadoB += Number(p.monto_pagado_bs);
-      const mesesAb = p.mes_correspondiente.split(',').map((m: string) => m.trim());
-      mesesAb.forEach((m: string) => {
-        mapaPagos.set(`${m}-${p.anio_correspondiente}`, p);
-      });
-    });
-
-    const lineas = [];
-    let deudaTotalAcumulada = 0;
-    const fechaActual = new Date();
-    const anoActual = fechaActual.getFullYear();
-    const mesActual = fechaActual.getMonth();
-
-    let anioIterador = ANO_INICIO_OPERACIONES;
-    let mesIterador = MES_INICIO_OPERACIONES;
-
-    // Bucle cronológico (De más viejo a más nuevo)
-    while (anioIterador < anoActual || (anioIterador === anoActual && mesIterador <= mesActual)) {
-      const nombreMes = mesesDelAno[mesIterador];
-      const claveBusqueda = `${nombreMes}-${anioIterador}`;
-      const pagoRealizado = mapaPagos.get(claveBusqueda);
-
-      if (pagoRealizado) {
-        lineas.push({
-          periodo: claveBusqueda, estatus: 'PAGADO', cargos_usd: 0, abonos_usd: pagoRealizado.monto_pagado_usd, abonos_bs: pagoRealizado.monto_pagado_bs,
-          descripcion: pagoRealizado.descripcion, fecha: new Date(pagoRealizado.created_at).toLocaleDateString()
-        });
-      } else {
-        lineas.push({
-          periodo: claveBusqueda, estatus: 'PENDIENTE', cargos_usd: CUOTA_MENSUAL_USD, abonos_usd: 0, abonos_bs: 0,
-          descripcion: 'Cuota Mensual de Condominio', fecha: '-'
-        });
-        deudaTotalAcumulada += CUOTA_MENSUAL_USD;
-      }
-
-      mesIterador++;
-      if (mesIterador > 11) { mesIterador = 0; anioIterador++; }
+  const getSemaforoEstilo = (item: any) => {
+    const nombre = item.propietario?.trim().toLowerCase() || '';
+    if (nombre === '' || nombre === 'vacío' || nombre === 'vacio') {
+      return { tarjeta: 'border-red-900/40 bg-red-950/30 text-red-400', badge: 'bg-red-500/20 text-red-400 border-red-500/30', texto: 'Disponible' };
     }
+    if (item.propietario && item.cedula && item.piso && item.inicio_mes && item.inicio_ano) {
+      return { tarjeta: 'border-emerald-900/40 bg-emerald-950/30 text-emerald-400', badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', texto: 'Completo' };
+    }
+    return { tarjeta: 'border-amber-900/40 bg-amber-950/30 text-amber-400', badge: 'bg-amber-500/20 text-amber-400 border-amber-500/30', texto: 'Incompleto' };
+  };
 
-    // Ya NO hacemos lineas.reverse() para mantener el orden de más viejo a más nuevo.
-    return { lineas: lineas, deudaTotalUSD: deudaTotalAcumulada, totalAbonadoUSD: totalPagadoU, totalAbonadoBs: totalPagadoB };
-  }, [filtroAptoTab2, pagosResidentes]);
+  const listaFiltradaCarta = propietarios.filter((item: any) =>
+    item.apartamento?.toString().toLowerCase().includes(buscar.toLowerCase()) ||
+    item.propietario?.toString().toLowerCase().includes(buscar.toLowerCase())
+  );
 
-  const dataResidentesFiltrada = pagosResidentes.filter(p => {
-    return (filtroAnio === '' || p.anio_correspondiente.toLowerCase().includes(filtroAnio.toLowerCase())) &&
-           (filtroMes === '' || p.mes_correspondiente.includes(filtroMes)) &&
-           (filtroPiso === '' || p.piso.toString().toLowerCase().includes(filtroPiso.toLowerCase())) &&
-           (filtroApto === '' || p.apartamento.toLowerCase().includes(filtroApto.toLowerCase()));
-  });
+  const pisosUnicos = Array.from(new Set(propietarios.map(p => p.piso).filter(Boolean))).sort((a: any, b: any) => Number(a) - Number(b));
+  const propietariosFiltradosActualizar = pisoActivo === 'TODOS' 
+    ? propietarios 
+    : propietarios.filter((p: any) => p.piso === pisoActivo);
 
-  const transaccionesMesTab5 = transacciones.filter(t => t.mes === filtroMesTab5 && t.anio === filtroAnioTab5);
-  const mesIngresoUSD = transaccionesMesTab5.reduce((acc, t) => acc + Number(t.ingreso_usd), 0);
-  const mesGastoUSD = transaccionesMesTab5.reduce((acc, t) => acc + Number(t.gasto_usd), 0);
-  const mesIngresoBs = transaccionesMesTab5.reduce((acc, t) => acc + Number(t.ingreso_bs), 0);
-  const mesGastoBs = transaccionesMesTab5.reduce((acc, t) => acc + Number(t.gasto_bs), 0);
-
-  if (!isAuth) {
+  if (!isLogged) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
-        <form onSubmit={handleLogin} className="bg-white border border-slate-200 p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-          <div className="flex justify-center mb-6"><div className="bg-emerald-900 p-4 rounded-full shadow-lg"><span className="text-3xl text-white">🏛️</span></div></div>
-          <h1 className="text-xl font-bold text-center text-emerald-950 uppercase tracking-widest mb-2">Finanzas D-10</h1>
-          <p className="text-center text-xs text-slate-500 mb-6 uppercase tracking-wider">Portal Tesorería</p>
-          <input type="password" placeholder="Clave de Tesorería" className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-center text-emerald-950 font-bold tracking-widest outline-none focus:border-emerald-600 mb-6 shadow-inner" value={pin} onChange={e => setPin(e.target.value)} />
-          <button type="submit" className="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg uppercase tracking-wider shadow-lg text-sm">Desbloquear Bóveda</button>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans">
+        <form onSubmit={handleLogin} className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-sm">
+          <div className="flex justify-between items-center mb-8 px-2">
+            <img src="/ministerio.png" alt="Min" className="h-10 w-auto object-contain opacity-80" onError={(e) => e.currentTarget.style.display='none'} />
+            <img src="/logo_edificio.png" alt="Torre D10" className="h-10 w-auto object-contain opacity-80" onError={(e) => e.currentTarget.style.display='none'} />
+          </div>
+          <h1 className="text-lg font-bold text-center text-white uppercase tracking-widest mb-6">Portal Administrativo</h1>
+          <input type="password" placeholder="Clave de acceso" className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-center text-white font-bold tracking-widest outline-none focus:border-blue-500 mb-6 transition-colors" value={password} onChange={e => setPassword(e.target.value)} />
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg uppercase tracking-wider transition-colors shadow-lg text-sm">Ingresar al Sistema</button>
         </form>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased pb-12 print:bg-white print:text-black print:p-0">
-      <style>{`@media print { @page { size: letter portrait; margin: 1cm; } .no-print { display: none !important; } body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } .print-area { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; border: none !important; } }`}</style>
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans antialiased pb-12 print:bg-white print:text-black print:p-0">
+      <style>{`
+        @media print {
+          @page { size: letter portrait; margin: 2.5cm 3cm 2.5cm 3cm; }
+          .no-print { display: none !important; }
+          body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .print-area { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; min-height: auto !important; height: auto !important; font-family: serif !important;}
+        }
+      `}</style>
       
-      {/* HEADER Y MENÚ DE PESTAÑAS AMPLIADO */}
-      <header className="no-print bg-emerald-950 border-b-4 border-emerald-700 py-4 px-6 shadow-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex flex-col gap-5">
-          <div className="flex items-center justify-between w-full">
-            <div className="w-1/3 flex justify-start items-center gap-3"><span className="text-2xl">🏛️</span><div><h1 className="text-lg font-bold text-white uppercase tracking-widest leading-tight">Torre D-10</h1><h2 className="text-[10px] text-emerald-400 uppercase tracking-widest">Enterprise Resource Planning (ERP)</h2></div></div>
-            <div className="w-1/3 text-center"><span className="bg-emerald-900 text-emerald-100 text-xs px-4 py-1.5 rounded-full border border-emerald-800 font-mono tracking-widest shadow-inner">ESTADO: EN LÍNEA</span></div>
-            <div className="w-1/3 flex justify-end"><button onClick={handleLogout} className="text-[10px] bg-white text-emerald-950 px-4 py-2 rounded-md hover:bg-slate-200 uppercase font-bold tracking-widest shadow-md">Cerrar Sesión</button></div>
-          </div>
+      {/* HEADER CORPORATIVO COMPACTO */}
+      <header className="no-print bg-slate-900 border-b border-slate-800 py-4 px-4 shadow-lg sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div className="max-w-5xl mx-auto flex flex-col gap-4">
           
-          {/* NUEVO MENÚ DE 7 PESTAÑAS */}
-          <div className="flex justify-start gap-1 bg-emerald-900/50 p-1 rounded-lg border border-emerald-800/50 w-full overflow-x-auto shadow-inner custom-scrollbar">
-            {[
-              { id: 'RESUMEN', label: '1. Resumen' }, 
-              { id: 'BUSQUEDA', label: '2. Búsqueda' }, 
-              { id: 'BASE_DATOS', label: '3. Recaudación' }, 
-              { id: 'GASTOS_GRAL', label: '4. Gastos' }, 
-              { id: 'GASTOS_MENSUAL', label: '5. Cierre Mensual' },
-              { id: 'EMISION_OFICIAL', label: '6. Emisión Oficial' },
-              { id: 'GESTION_DATOS', label: '7. Gestión de Datos' }
-            ].map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id as TabType)} className={`flex-none py-2 px-3 text-[10px] md:text-[11px] font-bold uppercase tracking-wider rounded-md transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-white text-emerald-950 shadow-md' : 'text-emerald-100 hover:bg-emerald-800 hover:text-white'}`}>{tab.label}</button>
-            ))}
+          {/* Fila Superior: Distribución Matemática 3 Columnas */}
+          <div className="flex items-center justify-between w-full">
+            {/* Izquierda: Ministerio */}
+            <div className="w-1/4 flex justify-start">
+              <img src="/ministerio.png" alt="Ministerio" className="h-10 md:h-14 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
+            </div>
+
+            {/* Centro: Títulos Compactos */}
+            <div className="w-2/4 text-center flex flex-col justify-center">
+              <h1 className="text-lg md:text-2xl font-bold text-white uppercase tracking-widest drop-shadow-sm leading-tight">Conjunto Residencial Torre D-10</h1>
+              <h2 className="text-[9px] md:text-xs text-slate-400 uppercase tracking-widest mt-1">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</h2>
+            </div>
+
+            {/* Derecha: Edificio y Botón Salir */}
+            <div className="w-1/4 flex flex-col items-end justify-center gap-2">
+              <img src="/logo_edificio.png" alt="Logo Edificio" className="h-10 md:h-14 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
+              <button onClick={() => { setIsLogged(false); setPassword(''); }} className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded transition-colors uppercase font-bold tracking-widest border border-slate-700">Cerrar Sesión</button>
+            </div>
+          </div>
+
+          {/* Fila Inferior: Pestañas */}
+          <div className="flex gap-2 bg-slate-950 p-1 rounded-lg border border-slate-800 w-full max-w-sm mx-auto">
+            <button onClick={() => setActiveTab('CARTA')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${activeTab === 'CARTA' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>Emisión Oficial</button>
+            <button onClick={() => setActiveTab('ACTUALIZAR')} className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${activeTab === 'ACTUALIZAR' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}>Gestión de Datos</button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 pt-8 animate-fadeIn">
+      <main className="max-w-5xl mx-auto px-4 pt-8">
         
-        {/* PESTAÑA 1: RESUMEN */}
-        {activeTab === 'RESUMEN' && (
-          <div className="no-print space-y-6">
-            <h2 className="text-2xl font-bold text-emerald-950 border-b border-slate-300 pb-2">Resumen Financiero Consolidado</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-600"><p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Total Ingresos USD</p><p className="text-3xl font-mono font-bold text-emerald-900">${formatMoney(totalIngresoUSD)}</p></div>
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-red-600"><p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Total Gastos USD</p><p className="text-3xl font-mono font-bold text-red-900">${formatMoney(totalGastoUSD)}</p></div>
-              <div className="bg-emerald-950 p-6 rounded-xl shadow-xl border-t-4 border-emerald-400"><p className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mb-1">Saldo Actual USD</p><p className="text-4xl font-mono font-bold text-white">${formatMoney(saldoActualUSD)}</p></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-500"><p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Total Ingresos Bs</p><p className="text-3xl font-mono font-bold text-emerald-700">Bs {formatMoney(totalIngresoBs)}</p></div>
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-red-500"><p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Total Gastos Bs</p><p className="text-3xl font-mono font-bold text-red-700">Bs {formatMoney(totalGastoBs)}</p></div>
-              <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500"><p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Saldo Actual Bs</p><p className="text-4xl font-mono font-bold text-amber-600">Bs {formatMoney(saldoActualBs)}</p></div>
-            </div>
-          </div>
-        )}
-
-        {/* PESTAÑA 2: ESTADO DE CUENTA CRONOLÓGICO */}
-        {activeTab === 'BUSQUEDA' && (
-          <div className="space-y-6">
-            <div className="no-print flex justify-between items-center border-b border-slate-300 pb-2">
-              <h2 className="text-2xl font-bold text-emerald-950">Estado de Cuenta Histórico</h2>
-              {filtroAptoTab2 && (
-                <button onClick={() => handlePrint(`Estado de Cuenta - Apto ${filtroAptoTab2}`)} className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded shadow-md text-xs uppercase tracking-widest transition-colors flex items-center gap-2">🖨️ Imprimir Estado</button>
-              )}
-            </div>
-            
-            <div className="no-print bg-white p-6 rounded-xl shadow-lg border border-slate-200 flex gap-4 items-end">
-               <div className="w-1/3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Seleccione Apartamento</label>
-                  <select value={filtroAptoTab2} onChange={e => setFiltroAptoTab2(e.target.value)} className="w-full p-3 border border-slate-300 rounded-lg text-sm bg-white font-bold text-emerald-900 focus:outline-none focus:border-emerald-500">
-                    <option value="">-- Buscar Apto --</option>
-                    {listaApartamentos.map(apto => <option key={apto} value={apto}>{apto}</option>)}
-                  </select>
-               </div>
-               <div className="w-2/3 flex justify-end items-center text-xs text-slate-400">
-                  <span className="bg-slate-100 px-3 py-1 rounded-full border border-slate-200">ℹ️ Cálculo desde Enero 2025. Próximamente se calculará desde la fecha de ingreso.</span>
-               </div>
-            </div>
-
-            {filtroAptoTab2 && (
-              <div className="print-area bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                <div className="border-b-2 border-emerald-900 pb-6 mb-6 flex justify-between items-start">
-                  <div>
-                    <h1 className="text-3xl font-bold text-emerald-950 tracking-widest">TORRE D-10</h1>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Estado de Cuenta General</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-emerald-900">APTO {filtroAptoTab2}</p>
-                    <p className="text-xs text-slate-500 font-mono mt-1">Corte a: {new Date().toLocaleDateString()}</p>
-                  </div>
+        {/* PESTAÑA: CARTA DE RESIDENCIA */}
+        {activeTab === 'CARTA' && (
+          <div className="no-print animate-fadeIn max-w-3xl mx-auto">
+            <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-6 items-end relative z-30">
+              <div className="w-full md:w-2/3 relative">
+                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Seleccionar Propietario</label>
+                <div className="flex">
+                  <input type="text" className="w-full bg-slate-950 border border-slate-800 rounded-l-xl p-3.5 text-sm font-semibold text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Buscar apto o nombre..." value={buscar} onChange={(e) => { setBuscar(e.target.value); setIsOpen(true); }} onFocus={() => setIsOpen(true)} />
+                  <button onClick={() => setIsOpen(!isOpen)} className="bg-slate-800 border-y border-r border-slate-700 rounded-r-xl px-4 text-slate-400 hover:text-white">▼</button>
                 </div>
-
-                <div className="grid grid-cols-3 gap-6 mb-8">
-                  <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-center shadow-sm">
-                     <p className="text-[10px] text-red-700 uppercase tracking-widest font-bold">Deuda Pendiente Total</p>
-                     <p className="text-3xl font-mono font-bold text-red-900">${formatMoney(estadoDeCuentaGenerado.deudaTotalUSD)}</p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 text-center shadow-sm">
-                     <p className="text-[10px] text-emerald-700 uppercase tracking-widest font-bold">Total Abonado Histórico USD</p>
-                     <p className="text-3xl font-mono font-bold text-emerald-900">${formatMoney(estadoDeCuentaGenerado.totalAbonadoUSD)}</p>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center shadow-sm">
-                     <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Total Abonado Histórico Bs</p>
-                     <p className="text-3xl font-mono font-bold text-emerald-900">Bs {formatMoney(estadoDeCuentaGenerado.totalAbonadoBs)}</p>
-                  </div>
-                </div>
-
-                <h3 className="text-sm font-bold text-emerald-900 uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">Detalle Mes a Mes (Orden Cronológico)</h3>
-                <table className="w-full text-left text-xs whitespace-nowrap mb-8">
-                  <thead className="bg-emerald-950 text-emerald-50 font-bold uppercase text-[10px] tracking-wider">
-                    <tr><th className="p-3">Periodo (Mes/Año)</th><th className="p-3">Estatus</th><th className="p-3">Fecha de Pago</th><th className="p-3 text-right">Cargos (Deuda)</th><th className="p-3 text-right">Descripción Referencial</th></tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {estadoDeCuentaGenerado.lineas.map((linea, idx) => (
-                      <tr key={idx} className={linea.estatus === 'PENDIENTE' ? 'bg-red-50/30' : ''}>
-                        <td className="p-3 font-semibold text-slate-800">{linea.periodo}</td>
-                        <td className="p-3">
-                          <span className={`px-2 py-1 rounded text-[9px] font-bold tracking-widest ${linea.estatus === 'PAGADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                            {linea.estatus}
-                          </span>
-                        </td>
-                        <td className="p-3 text-slate-500 font-mono">{linea.fecha}</td>
-                        <td className="p-3 text-right font-mono font-bold text-slate-700">
-                          {linea.estatus === 'PENDIENTE' ? `$${formatMoney(linea.cargos_usd)}` : '-'}
-                        </td>
-                        <td className="p-3 text-right text-slate-500 text-[10px] truncate max-w-[200px]">{linea.descripcion}</td>
-                      </tr>
+                {isOpen && (
+                  <ul className="absolute left-0 right-0 mt-2 max-h-60 bg-slate-900 border border-slate-800 rounded-xl overflow-y-auto shadow-2xl z-50 divide-y divide-slate-800 custom-scrollbar">
+                    {listaFiltradaCarta.map((item: any, idx: number) => (
+                      <li key={idx} onClick={() => { setPropietarioSeleccionado(item); setBuscar(item.apartamento); setIsOpen(false); }} className="p-4 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer flex justify-between items-center transition-colors">
+                        <span className="font-bold bg-slate-950 px-3 py-1 rounded text-white border border-slate-800">{item.apartamento}</span>
+                        <span className="text-xs truncate max-w-[200px] uppercase font-mono">{item.propietario || 'Disponible'}</span>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
+                  </ul>
+                )}
               </div>
-            )}
+              <div className="w-full md:w-1/3">
+                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Fecha del Documento</label>
+                <input type="date" value={fechaManual} onChange={handleCambioFecha} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-semibold text-white cursor-pointer focus:outline-none focus:border-blue-500 transition-colors" />
+              </div>
+            </div>
+            <button onClick={handlePrint} disabled={!propietarioSeleccionado} className={`w-full mt-6 py-4 rounded-xl font-bold uppercase tracking-widest text-sm transition-all shadow-xl flex items-center justify-center gap-2 ${propietarioSeleccionado ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-slate-900 text-slate-600 cursor-not-allowed border border-slate-800'}`}>🖨️ Generar Constancia Oficial</button>
           </div>
         )}
 
-        {/* PESTAÑA 3: RECAUDACIÓN (CON BOTÓN DE ELIMINAR) */}
-        {activeTab === 'BASE_DATOS' && (
-          <div className="no-print space-y-6 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-emerald-950 border-b border-slate-300 pb-2">Master Ledger de Residentes</h2>
-            <form onSubmit={handleRegistrarPagoResidente} className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Cargar Pago de Condominio</h3>
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 items-start">
-                <div className="md:col-span-3"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Apartamento</label><select value={formPagoResidente.apartamento} onChange={e => setFormPagoResidente({...formPagoResidente, apartamento: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg text-sm bg-white font-semibold focus:outline-none focus:border-emerald-500" required><option value="">-- Seleccionar --</option>{listaApartamentos.map(apto => <option key={apto} value={apto}>{apto}</option>)}</select></div>
-                <div className="md:col-span-2"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Año</label><input type="text" value={formPagoResidente.anio_correspondiente} onChange={e => setFormPagoResidente({...formPagoResidente, anio_correspondiente: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:border-emerald-500" required /></div>
-                <div className="md:col-span-7"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meses a Cancelar (Selección Múltiple)</label><div className="grid grid-cols-3 lg:grid-cols-4 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">{mesesDelAno.map(mes => (<label key={mes} className="flex items-center space-x-2 text-xs font-medium cursor-pointer text-slate-700 hover:text-emerald-700"><input type="checkbox" checked={formPagoResidente.meses_seleccionados.includes(mes)} onChange={() => toggleMes(mes)} className="accent-emerald-600 w-3 h-3" /><span>{mes}</span></label>))}</div></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-                <div className="md:col-span-3"><label className="block text-[10px] font-bold text-emerald-700 uppercase mb-1">Monto de Recibo USD</label><input type="number" step="0.01" placeholder="0.00" value={formPagoResidente.monto_pagado_usd} onChange={e => setFormPagoResidente({...formPagoResidente, monto_pagado_usd: e.target.value})} className="w-full p-3 border border-emerald-200 rounded-lg text-sm font-mono focus:outline-none focus:border-emerald-500" /></div>
-                <div className="md:col-span-3"><label className="block text-[10px] font-bold text-emerald-700 uppercase mb-1">Monto de Recibo Bs.</label><input type="number" step="0.01" placeholder="0.00" value={formPagoResidente.monto_pagado_bs} onChange={e => setFormPagoResidente({...formPagoResidente, monto_pagado_bs: e.target.value})} className="w-full p-3 border border-emerald-200 rounded-lg text-sm font-mono focus:outline-none focus:border-emerald-500" /></div>
-                <div className="md:col-span-6"><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Descripción del Pago</label><input type="text" placeholder="Ej. Pago por Zelle #1234..." value={formPagoResidente.descripcion} onChange={e => setFormPagoResidente({...formPagoResidente, descripcion: e.target.value})} className="w-full p-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-emerald-500" /></div>
-              </div>
-              <div className="flex justify-end"><button type="submit" className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md uppercase tracking-widest text-xs transition-transform active:scale-95">💾 Registrar Recaudación</button></div>
-            </form>
+        {/* PESTAÑA: ACTUALIZAR DATA */}
+        {activeTab === 'ACTUALIZAR' && (
+          <div className="no-print flex flex-col md:flex-row gap-6 animate-fadeIn">
             
-            <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3">Filtros de Auditoría Avanzada</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <input type="text" placeholder="🔍 Filtrar por Año" value={filtroAnio} onChange={e => setFiltroAnio(e.target.value)} className="p-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50 font-mono" />
-                <select value={filtroMes} onChange={e => setFiltroMes(e.target.value)} className="p-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50 cursor-pointer"><option value="">🔍 Todos los Meses</option>{mesesDelAno.map(m => <option key={m} value={m}>{m}</option>)}</select>
-                <input type="text" placeholder="🔍 Filtrar por Piso" value={filtroPiso} onChange={e => setFiltroPiso(e.target.value)} className="p-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50" />
-                <input type="text" placeholder="🔍 Filtrar por Apartamento" value={filtroApto} onChange={e => setFiltroApto(e.target.value)} className="p-2.5 border border-slate-200 rounded-lg text-xs bg-slate-50 uppercase font-bold text-emerald-800" />
-              </div>
+            {/* Panel Lateral Elegante */}
+            <div className="w-full md:w-52 flex flex-row md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+              <button onClick={() => setPisoActivo('TODOS')} className={`px-4 py-3.5 flex-none md:w-full rounded-xl text-xs font-bold tracking-wider uppercase transition-colors shadow-sm text-left ${pisoActivo === 'TODOS' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 hover:text-white'}`}>
+                🏢 Todos los Pisos
+              </button>
+              {pisosUnicos.map(piso => (
+                <button key={piso} onClick={() => setPisoActivo(piso as string)} className={`px-4 py-3 flex-none md:w-full rounded-xl text-xs font-bold tracking-wider uppercase transition-colors shadow-sm text-left ${pisoActivo === piso ? 'bg-slate-800 text-white border border-slate-600' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 hover:text-white'}`}>
+                  Nivel {piso}
+                </button>
+              ))}
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-x-auto">
-              <table className="w-full text-left text-xs whitespace-nowrap">
-                <thead className="bg-slate-900 text-white font-mono uppercase text-[10px] tracking-wider">
-                  <tr><th className="p-4 text-center">Nivel</th><th className="p-4">Apartamento</th><th className="p-4">Meses Abonados</th><th className="p-4">Descripción</th><th className="p-4 text-right bg-emerald-950/20">Recibo USD</th><th className="p-4 text-right bg-emerald-950/20">Recibo Bs.</th><th className="p-4 text-center">Acciones</th></tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {dataResidentesFiltrada.length === 0 ? (<tr><td colSpan={7} className="p-8 text-center text-slate-400 font-medium">Ningún registro coincide.</td></tr>) : (
-                    dataResidentesFiltrada.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="p-4 text-center font-mono font-bold text-slate-500">Piso {item.piso}</td>
-                        <td className="p-4 font-bold text-emerald-900">{item.apartamento}</td>
-                        <td className="p-4"><span className="font-semibold text-slate-700 truncate block max-w-[150px]">{item.mes_correspondiente}</span> <span className="font-mono text-slate-400">{item.anio_correspondiente}</span></td>
-                        <td className="p-4 text-slate-500 truncate max-w-[150px]">{item.descripcion}</td>
-                        <td className="p-4 text-right font-mono font-bold text-emerald-600">${formatMoney(item.monto_pagado_usd)}</td>
-                        <td className="p-4 text-right font-mono font-bold text-emerald-600">Bs {formatMoney(item.monto_pagado_bs)}</td>
-                        <td className="p-4 text-center">
-                          <button onClick={() => handleEliminarPagoResidente(item.id)} className="bg-red-100 text-red-600 hover:bg-red-600 hover:text-white p-2 rounded transition-colors" title="Eliminar Registro">🗑️</button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+            {/* Grilla Ejecutiva */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 h-fit">
+              {propietariosFiltradosActualizar.map((item: any) => {
+                const estilo = getSemaforoEstilo(item);
+                return (
+                  <div key={item.id} className={`p-5 rounded-xl border transition-all flex flex-col justify-between shadow-md bg-slate-900 hover:border-slate-600`}>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className="text-xl font-bold tracking-tight block text-white">Apto {item.apartamento}</span>
+                        <span className={`text-xs font-bold uppercase block mt-1 tracking-wider ${item.propietario ? 'text-blue-400' : 'text-slate-500'}`}>{item.propietario || 'Sin Propietario Registrado'}</span>
+                      </div>
+                      <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded border ${estilo.badge}`}>{estilo.texto}</span>
+                    </div>
+                    
+                    <div className="text-[11px] font-mono text-slate-400 space-y-1.5 mb-5 border-t border-slate-800 pt-3">
+                      <div className="flex justify-between"><span className="uppercase text-[9px] tracking-widest">Cédula:</span> <span className="text-slate-200 font-sans font-medium">{item.cedula || 'Pendiente'}</span></div>
+                      <div className="flex justify-between"><span className="uppercase text-[9px] tracking-widest">Piso:</span> <span className="text-slate-200 font-sans font-medium">{item.piso || 'Pendiente'}</span></div>
+                      <div className="flex justify-between"><span className="uppercase text-[9px] tracking-widest">Ingreso:</span> <span className="text-slate-200 font-sans font-medium">{item.inicio_mes ? `${item.inicio_mes} ${item.inicio_ano}` : 'Pendiente'}</span></div>
+                    </div>
 
-        {/* PESTAÑA 4: GASTOS (CON BOTÓN DE ELIMINAR) */}
-        {activeTab === 'GASTOS_GRAL' && (
-          <div className="no-print space-y-6 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-emerald-950 border-b border-slate-300 pb-2">Libro Diario de Egresos Operativos</h2>
-            <form onSubmit={handleRegistrarMovimiento} className="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Registrar Nuevo Gasto Operativo</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <input type="text" placeholder="Año (Ej. 2026)" value={formGasto.anio} onChange={e => setFormGasto({...formGasto, anio: e.target.value})} className="p-3 border border-slate-300 rounded-lg text-sm" required />
-                <select value={formGasto.mes} onChange={e => setFormGasto({...formGasto, mes: e.target.value})} className="p-3 border border-slate-300 rounded-lg text-sm bg-white" required><option value="">-- Mes --</option>{mesesDelAno.map(m => <option key={m} value={m}>{m}</option>)}</select>
-                <input type="text" placeholder="Referencia de Factura" value={formGasto.referencia} onChange={e => setFormGasto({...formGasto, referencia: e.target.value})} className="p-3 border border-slate-300 rounded-lg text-sm" />
-                <input type="text" placeholder="Descripción del Gasto" value={formGasto.descripcion} onChange={e => setFormGasto({...formGasto, descripcion: e.target.value})} className="p-3 border border-slate-300 rounded-lg text-sm" required />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-red-50 p-4 rounded-lg border border-red-100">
-                <div><label className="block text-[10px] font-bold text-red-700 uppercase mb-1">Gasto Realizado USD (-)</label><input type="number" step="0.01" value={formGasto.gasto_usd} onChange={e => setFormGasto({...formGasto, gasto_usd: e.target.value})} className="w-full p-3 border border-red-200 rounded-lg text-sm font-mono" /></div>
-                <div><label className="block text-[10px] font-bold text-red-700 uppercase mb-1">Gasto Realizado Bs (-)</label><input type="number" step="0.01" value={formGasto.gasto_bs} onChange={e => setFormGasto({...formGasto, gasto_bs: e.target.value})} className="w-full p-3 border border-red-200 rounded-lg text-sm font-mono" /></div>
-              </div>
-              <div className="flex justify-end"><button type="submit" className="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-lg shadow-md uppercase tracking-widest text-xs">💾 Registrar Gasto en Libro</button></div>
-            </form>
-
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-x-auto">
-               <table className="w-full text-left text-xs whitespace-nowrap">
-                 <thead className="bg-emerald-950 text-white font-mono uppercase text-[10px] tracking-wider">
-                   <tr><th className="p-4">Periodo</th><th className="p-4">Descripción / Ref</th><th className="p-4 text-right bg-emerald-900">Ingreso $</th><th className="p-4 text-right bg-red-950">Gasto $</th><th className="p-4 text-right border-r border-slate-700">Saldo $</th><th className="p-4 text-right bg-emerald-900">Ingreso Bs</th><th className="p-4 text-right bg-red-950">Gasto Bs</th><th className="p-4 text-right border-r border-slate-700">Saldo Bs</th><th className="p-4 text-center">Acciones</th></tr>
-                 </thead>
-                 <tbody className="divide-y divide-slate-100">
-                    {transacciones.length === 0 ? (<tr><td colSpan={9} className="p-8 text-center text-slate-400 font-medium">No hay transacciones registradas.</td></tr>) : (
-                      transacciones.map((t) => (
-                        <tr key={t.id} className="hover:bg-slate-50">
-                          <td className="p-4"><span className="font-bold">{t.anio}</span> <span className="text-slate-500 uppercase text-[10px]">{t.mes}</span></td>
-                          <td className="p-4"><div className="font-medium text-slate-800">{t.descripcion}</div><div className="text-[10px] text-slate-400 font-mono">Ref: {t.referencia}</div></td>
-                          <td className="p-4 text-right font-mono text-emerald-600">{Number(t.ingreso_usd) > 0 ? `+${formatMoney(t.ingreso_usd)}` : '-'}</td>
-                          <td className="p-4 text-right font-mono text-red-600">{Number(t.gasto_usd) > 0 ? `-${formatMoney(t.gasto_usd)}` : '-'}</td>
-                          <td className="p-4 text-right font-mono font-bold border-r border-slate-100 bg-slate-50">{formatMoney(t.saldo_usd)}</td>
-                          <td className="p-4 text-right font-mono text-emerald-600">{Number(t.ingreso_bs) > 0 ? `+${formatMoney(t.ingreso_bs)}` : '-'}</td>
-                          <td className="p-4 text-right font-mono text-red-600">{Number(t.gasto_bs) > 0 ? `-${formatMoney(t.gasto_bs)}` : '-'}</td>
-                          <td className="p-4 text-right font-mono font-bold border-r border-slate-100 bg-slate-50">{formatMoney(t.saldo_bs)}</td>
-                          <td className="p-4 text-center">
-                            <button onClick={() => handleEliminarTransaccion(t.id)} className="bg-red-100 text-red-600 hover:bg-red-600 hover:text-white p-2 rounded transition-colors" title="Eliminar Registro">🗑️</button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                 </tbody>
-               </table>
+                    <button onClick={() => setEditingProp(item)} className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition-colors">Modificar Registro</button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* PESTAÑA 5: CIERRE MENSUAL */}
-        {activeTab === 'GASTOS_MENSUAL' && (
-          <div className="space-y-6">
-            <div className="no-print flex justify-between items-center border-b border-slate-300 pb-2">
-              <h2 className="text-2xl font-bold text-emerald-950">Cierre Contable Mensual</h2>
-              {filtroMesTab5 && (
-                <button onClick={() => handlePrint(`Cierre Mensual - ${filtroMesTab5} ${filtroAnioTab5}`)} className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded shadow-md text-xs uppercase tracking-widest transition-colors flex items-center gap-2">🖨️ Imprimir Cierre</button>
-              )}
-            </div>
-            <div className="no-print bg-white p-6 rounded-xl shadow-lg border border-slate-200 flex gap-4 items-end">
-               <div className="w-1/4">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Filtrar por Año</label>
-                  <input type="text" value={filtroAnioTab5} onChange={e => setFiltroAnioTab5(e.target.value)} className="w-full p-3 border border-slate-300 rounded-lg text-sm bg-white font-mono focus:outline-none focus:border-emerald-500" />
-               </div>
-               <div className="w-1/3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Filtrar por Mes</label>
-                  <select value={filtroMesTab5} onChange={e => setFiltroMesTab5(e.target.value)} className="w-full p-3 border border-slate-300 rounded-lg text-sm bg-white font-bold text-emerald-900 focus:outline-none focus:border-emerald-500">
-                    <option value="">-- Seleccione Mes --</option>
-                    {mesesDelAno.map(mes => <option key={mes} value={mes}>{mes}</option>)}
+        {/* Modal Ejecutivo de Edición */}
+        {editingProp && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 no-print animate-fadeIn">
+            <form onSubmit={handleSavePropietario} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 className="text-lg font-bold uppercase tracking-wider text-white">Apto {editingProp.apartamento}</h3>
+                <span className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700 font-mono">Edición</span>
+              </div>
+              
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Nombre Completo del Propietario</label>
+                <input type="text" value={editingProp.propietario || ''} onChange={e => setEditingProp({...editingProp, propietario: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Ej: SINDY CHACÓN" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Cédula</label>
+                  <input type="text" value={editingProp.cedula || ''} onChange={e => setEditingProp({...editingProp, cedula: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Ej: 17693292" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Piso</label>
+                  <input type="text" value={editingProp.piso || ''} onChange={e => setEditingProp({...editingProp, piso: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="Ej: 1" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Mes de Ingreso</label>
+                  <select value={editingProp.inicio_mes || ''} onChange={e => setEditingProp({...editingProp, inicio_mes: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 appearance-none transition-colors cursor-pointer">
+                    <option value="">-- Seleccionar --</option>
+                    {mesesLetras.map(mes => <option key={mes} value={mes} className="capitalize">{mes}</option>)}
                   </select>
-               </div>
-            </div>
-            {filtroMesTab5 && (
-              <div className="print-area bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                <div className="border-b-2 border-emerald-900 pb-6 mb-6 flex justify-between items-center">
-                  <div>
-                    <h1 className="text-3xl font-bold text-emerald-950 tracking-widest">TORRE D-10</h1>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Cierre de Flujo de Caja</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-emerald-900 uppercase">{filtroMesTab5} {filtroAnioTab5}</p>
-                    <p className="text-xs text-slate-500 font-mono mt-1">Generado: {new Date().toLocaleDateString()}</p>
-                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-6 mb-8">
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-200 pb-1">Balance Operativo USD</p>
-                    <div className="flex justify-between text-sm mb-1"><span className="text-slate-600">Total Ingresos:</span><span className="font-mono text-emerald-600 font-bold">+${formatMoney(mesIngresoUSD)}</span></div>
-                    <div className="flex justify-between text-sm mb-2"><span className="text-slate-600">Total Egresos:</span><span className="font-mono text-red-600 font-bold">-${formatMoney(mesGastoUSD)}</span></div>
-                    <div className="flex justify-between text-base border-t border-slate-200 pt-2"><span className="font-bold text-slate-800">Neto Mensual:</span><span className={`font-mono font-bold ${mesIngresoUSD - mesGastoUSD >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>${formatMoney(mesIngresoUSD - mesGastoUSD)}</span></div>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 border-b border-slate-200 pb-1">Balance Operativo Bs.</p>
-                    <div className="flex justify-between text-sm mb-1"><span className="text-slate-600">Total Ingresos:</span><span className="font-mono text-emerald-600 font-bold">+Bs {formatMoney(mesIngresoBs)}</span></div>
-                    <div className="flex justify-between text-sm mb-2"><span className="text-slate-600">Total Egresos:</span><span className="font-mono text-red-600 font-bold">-Bs {formatMoney(mesGastoBs)}</span></div>
-                    <div className="flex justify-between text-base border-t border-slate-200 pt-2"><span className="font-bold text-slate-800">Neto Mensual:</span><span className={`font-mono font-bold ${mesIngresoBs - mesGastoBs >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>Bs {formatMoney(mesIngresoBs - mesGastoBs)}</span></div>
-                  </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Año de Ingreso</label>
+                  <select value={editingProp.inicio_ano || ''} onChange={e => setEditingProp({...editingProp, inicio_ano: e.target.value})} className="w-full bg-slate-950 border border-slate-800 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 appearance-none transition-colors cursor-pointer">
+                    <option value="">-- Seleccionar --</option>
+                    {listaAnios.map(anio => <option key={anio} value={anio}>{anio}</option>)}
+                  </select>
                 </div>
-                <table className="w-full text-left text-[11px] whitespace-nowrap">
-                  <thead className="bg-emerald-50 text-emerald-900 font-bold uppercase tracking-wider border-y border-emerald-900">
-                    <tr><th className="p-2">Fecha/ID</th><th className="p-2">Descripción</th><th className="p-2 text-right">Ingreso $</th><th className="p-2 text-right">Egreso $</th><th className="p-2 text-right border-r border-emerald-200">Saldo $</th><th className="p-2 text-right">Ingreso Bs</th><th className="p-2 text-right">Egreso Bs</th><th className="p-2 text-right">Saldo Bs</th></tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {transaccionesMesTab5.length === 0 ? (<tr><td colSpan={8} className="p-8 text-center text-slate-400">Sin movimientos registrados.</td></tr>) : (
-                      transaccionesMesTab5.map((t) => (
-                        <tr key={t.id}>
-                          <td className="p-2 text-slate-500 font-mono">#{t.id}</td><td className="p-2 text-slate-800 font-medium truncate max-w-[200px]">{t.descripcion}</td><td className="p-2 text-right font-mono text-emerald-600">{Number(t.ingreso_usd) > 0 ? `+${formatMoney(t.ingreso_usd)}` : '-'}</td><td className="p-2 text-right font-mono text-red-600">{Number(t.gasto_usd) > 0 ? `-${formatMoney(t.gasto_usd)}` : '-'}</td><td className="p-2 text-right font-mono font-bold border-r border-emerald-50">{formatMoney(t.saldo_usd)}</td><td className="p-2 text-right font-mono text-emerald-600">{Number(t.ingreso_bs) > 0 ? `+${formatMoney(t.ingreso_bs)}` : '-'}</td><td className="p-2 text-right font-mono text-red-600">{Number(t.gasto_bs) > 0 ? `-${formatMoney(t.gasto_bs)}` : '-'}</td><td className="p-2 text-right font-mono font-bold">{formatMoney(t.saldo_bs)}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
               </div>
-            )}
+
+              <div className="flex gap-3 pt-3">
+                <button type="button" onClick={() => setEditingProp(null)} className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-lg text-xs uppercase tracking-wider transition-colors border border-slate-700">Cancelar</button>
+                <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-wider transition-colors shadow-lg shadow-blue-900/20">Guardar Datos</button>
+              </div>
+            </form>
           </div>
         )}
-
-        {/* PESTAÑA 6: EMISIÓN OFICIAL (SKELETON PARA FUSIÓN) */}
-        {activeTab === 'EMISION_OFICIAL' && (
-          <div className="space-y-6 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-emerald-950 border-b border-slate-300 pb-2">Módulo de Emisión Oficial</h2>
-            <div className="bg-white p-12 rounded-xl shadow-lg border border-slate-200 text-center">
-              <span className="text-5xl mb-4 block">🏗️</span>
-              <h3 className="text-xl font-bold text-emerald-900 mb-2">Espacio reservado para Constancias de Residencia</h3>
-              <p className="text-slate-500 max-w-lg mx-auto">En el siguiente paso, inyectaremos aquí el código de tu proyecto <b>carta_residencia</b> para unificar todo el sistema administrativo de la Torre D-10.</p>
-            </div>
-          </div>
-        )}
-
-        {/* PESTAÑA 7: GESTIÓN DE DATOS (SKELETON PARA FUSIÓN) */}
-        {activeTab === 'GESTION_DATOS' && (
-          <div className="space-y-6 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-emerald-950 border-b border-slate-300 pb-2">Gestión de Datos (Base Maestra)</h2>
-            <div className="bg-white p-12 rounded-xl shadow-lg border border-slate-200 text-center">
-              <span className="text-5xl mb-4 block">🗄️</span>
-              <h3 className="text-xl font-bold text-emerald-900 mb-2">Censo de Propietarios y Fechas de Ingreso</h3>
-              <p className="text-slate-500 max-w-lg mx-auto">Esta pestaña controlará la base de datos de los residentes. Sus "Fechas de Ingreso" serán utilizadas por la Pestaña 2 para calcular el Estado de Cuenta exacto de cada apartamento.</p>
-            </div>
-          </div>
-        )}
-
       </main>
+
+      {/* ÁREA DE IMPRESIÓN OFICIAL */}
+      {activeTab === 'CARTA' && (
+        <div className="print-area max-w-[800px] mx-auto bg-white text-black mt-8 p-[2.5cm] shadow-2xl min-h-[11in] text-justify flex flex-col justify-between" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt' }}>
+          {propietarioSeleccionado ? (
+            <>
+              <div>
+                <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-8">
+                  <img src="/ministerio.png" alt="Ministerio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
+                  <img src="/logo_edificio.png" alt="Logo Edificio" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display='none'} />
+                </div>
+
+                <h2 className="text-center font-bold underline uppercase tracking-wide mb-8" style={{ fontSize: '18pt' }}>Constancia de Residencia</h2>
+
+                <p className="mb-5 font-normal" style={{ lineHeight: '1.7' }}>
+                  Quienes suscriben, en representación del <strong className="font-bold">COMITÉ MULTIFAMILIAR DE GESTIÓN (C.M.G.) DE LA TORRE D-10</strong>, 
+                  en el ejercicio de nuestras facultades como Voceros Principales del referido Comité en el Urbanismo "Simón Bolívar", 
+                  Sector D, Ciudad Tiuna, por medio de la presente, hacemos constar que el (la) ciudadano (a) <strong className="font-bold uppercase">{propietarioSeleccionado.propietario}</strong>, 
+                  titular de la cédula de identidad N° <strong className="font-bold">V-{propietarioSeleccionado.cedula}</strong>, de nacionalidad venezolano (a), 
+                  habita en la: <strong className="font-bold">Torre D-10, Piso {propietarioSeleccionado.piso}, Apartamento {propietarioSeleccionado.apartamento}</strong>, 
+                  desde el mes de {propietarioSeleccionado.inicio_mes} del año {propietarioSeleccionado.inicio_ano}.
+                </p>
+
+                <p className="mb-5" style={{ lineHeight: '1.7' }}>Tiempo durante el cual, el ciudadano ha mantenido una conducta ejemplar, observando los principios de convivencia ciudadana y respeto a las normas comunitarias establecidas en la edificación.</p>
+                <p className="mb-5" style={{ lineHeight: '1.7' }}>Constancia que se expide a petición de la parte interesada en la ciudad de Caracas, a los {fechaActual.diaLetras} ({fechaActual.diaNumero}) días del mes de {fechaActual.mesLetras} del año {fechaActual.anoNumero}.</p>
+              </div>
+
+              <div>
+                <div className="text-center" style={{ lineHeight: '1.7' }}>
+                  <p className="font-normal m-0 p-0">Atentamente,</p>
+                  <p className="m-0 p-0"><strong className="font-bold">Comité Multifamiliar de Gestión de la TORRE D-10</strong></p>
+                </div>
+                <div className="h-14"></div>
+                <div className="mb-5 font-normal grid grid-cols-2 gap-x-12 text-center" style={{ fontSize: '11pt' }}>
+                  <div>
+                    <p className="border-t border-black pt-2"><strong className="font-bold">Vocera Principal</strong></p>
+                    <p><strong className="font-bold">Sindy Chacón</strong></p>
+                    <p>C.I V- 17.693.292</p>
+                    <p>Telf. (0424) 560-15-62</p>
+                  </div>
+                  <div>
+                    <p className="border-t border-black pt-2"><strong className="font-bold">Vocero Principal</strong></p>
+                    <p><strong className="font-bold">Marcos Díaz</strong></p>
+                    <p>C.I V- 16.662.440</p>
+                    <p>Telf. (0414) 017-40-62</p>
+                  </div>
+                </div>
+                <p className="italic mb-4" style={{ fontSize: '8pt', lineHeight: '1.6' }}><strong className="font-bold">Nota: Se deja constancia que a la presente fecha el CMG de la torre D10, se encuentra en proceso de regularización ante la Inmobiliaria Nacional.</strong></p>
+                <footer className="text-center pt-3 border-t border-gray-200" style={{ fontSize: '10pt' }}><strong className="font-bold">Urbanismo Simón Bolívar, Sector D, Torre D-10, Ciudad Tiuna, Coche – Caracas</strong></footer>
+              </div>
+            </>
+          ) : (
+            <div className="h-[70vh] flex flex-col items-center justify-center text-slate-800 border-4 border-dashed border-slate-200 rounded-2xl no-print font-sans">
+              <span className="text-5xl mb-4 text-slate-300">🏢</span>
+              <p className="text-sm font-semibold tracking-wide text-slate-400">Busca un vecino en el panel web para previsualizar el PDF oficial.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
