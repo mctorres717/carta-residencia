@@ -34,6 +34,22 @@ export default function SistemaTorreD10() {
   const [pisoActivo, setPisoActivo] = useState('TODOS');
 
   useEffect(() => {
+    // --- INYECTOR DE PWA PARA MÓVILES ---
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (!document.querySelector('link[rel="manifest"]')) {
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = '/manifest.json';
+        document.head.appendChild(link);
+      }
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
+    }
+  }, []);
     const hoy = new Date();
     actualizarFecha(hoy);
     setFechaManual(hoy.toISOString().split('T')[0]);
